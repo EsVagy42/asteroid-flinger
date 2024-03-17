@@ -1,13 +1,13 @@
 use core::ops::*;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct ModFloat(f64);
+pub struct ModFloat(pub f32);
 
-const MODULO: f64 = 512.0;
-const MODULO_HALF: f64 = MODULO / 2.0;
+const MODULO: f32 = 512.0;
+const MODULO_HALF: f32 = MODULO / 2.0;
 
 impl ModFloat {
-    pub fn new(x: f64) -> Self {
+    pub fn new(x: f32) -> Self {
         ModFloat((x + MODULO_HALF).rem_euclid(MODULO) - MODULO_HALF)
     }
 
@@ -19,7 +19,7 @@ impl ModFloat {
         }
     }
 
-    pub fn value(&self) -> f64 {
+    pub fn value(&self) -> f32 {
         self.0
     }
 }
