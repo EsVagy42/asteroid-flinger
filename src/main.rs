@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-mod mod_float;
-use mod_float::*;
-mod mod_float_vec;
+mod wrap;
 
 fn main() {
     App::new()
