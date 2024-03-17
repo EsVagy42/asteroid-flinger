@@ -18,6 +18,10 @@ impl ModFloat {
             *self
         }
     }
+
+    pub fn value(&self) -> f64 {
+        self.0
+    }
 }
 
 impl Add for ModFloat {
@@ -93,5 +97,10 @@ mod tests {
     #[test]
     fn test_new() {
         assert_eq!(ModFloat::new(256.), ModFloat::new(-256.));
+    }
+
+    #[test]
+    fn test_value() {
+        assert_eq!(ModFloat::new(256.).value(), -256.);
     }
 }
