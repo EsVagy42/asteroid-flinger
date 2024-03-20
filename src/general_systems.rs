@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::player::Player;
+use crate::general_components::*;
 
 pub fn startup(
     mut commands: Commands,
