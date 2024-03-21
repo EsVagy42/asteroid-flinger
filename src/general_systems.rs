@@ -45,3 +45,12 @@ pub fn apply_velocities(
         transform.translation += ((velocity.0 - player_velocity.0) * time.delta_seconds()).extend(1.0);
     } 
 } 
+
+pub fn apply_drags(
+    mut query: Query<(&mut Velocity, &Drag)>,
+    time: Res<Time>,
+) {
+    for (mut velocity, drag) in query.iter_mut() {
+        velocity.0 *= f32::powf(1. - drag.0, time.delta_seconds());
+    }
+}

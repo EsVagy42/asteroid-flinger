@@ -14,6 +14,6 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .insert_resource(input::GameInput::default())
         .add_systems(Startup, startup)
-        .add_systems(Update, (input::update_input, player::update_player, apply_velocities).chain())
+        .add_systems(Update, (input::update_input, player::update_player, apply_velocities, apply_drags))
         .run();
 }
