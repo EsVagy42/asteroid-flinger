@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use crate::input::GameInput;
+use crate::{input::GameInput, Velocity};
+
+const PLAYER_SPEED: f32 = 10.;
 
 #[derive(Component)]
 pub struct Player;
@@ -9,13 +11,11 @@ pub struct Player;
 pub struct PlayerPosition(pub Vec2);
 
 pub fn update_player(
-    mut player_query: Query<(&mut Transform, &mut Sprite, &mut TextureAtlas), With<Player>>,
-    mut player_position: ResMut<PlayerPosition>,
+    mut player_query: Query<(&mut Sprite, &mut TextureAtlas, &mut Velocity), With<Player>>,
     input: Res<GameInput>,
 ) {
-    let mut player = player_query.single_mut();
-    player_position.as_mut().0 = player.0.translation.truncate();
-    player.1.flip_x = input.sprite_modifier.flip_x;
-    player.1.flip_y = input.sprite_modifier.flip_y;
-    player.2.index = input.sprite_modifier.index;
+    let (mut sprite, mut texture_atlas, mut velocity) = player_query.single_mut();
+    input.sprite_modifier.apply_to_sprite(sprite.as_mut());
+    input.sprite_modifier.apply_to_atlas(texture_atlas.as_mut());
+    velocity.0 = input.direction * PLAYER_SPEED;
 }

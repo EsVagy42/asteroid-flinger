@@ -32,6 +32,17 @@ impl Default for InputSpriteModifier {
     }
 }
 
+impl InputSpriteModifier {
+    pub fn apply_to_sprite(&self, sprite: &mut Sprite) {
+        sprite.flip_x = self.flip_x;
+        sprite.flip_y = self.flip_y;
+    }
+
+    pub fn apply_to_atlas(&self, atlas: &mut TextureAtlas) {
+        atlas.index = self.index;
+    }
+}
+
 pub fn update_input(
     mut input: ResMut<GameInput>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
