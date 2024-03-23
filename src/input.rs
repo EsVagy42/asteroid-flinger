@@ -48,19 +48,19 @@ pub fn update_input(
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     let mut direction = Vec2::ZERO;
-    if keyboard_input.pressed(KeyCode::KeyW)
+    if keyboard_input.pressed(KeyCode::KeyD)
     {
         direction += Vec2::new(1.0, 0.0);
     }
-    if keyboard_input.pressed(KeyCode::KeyS)
+    if keyboard_input.pressed(KeyCode::KeyA)
     {
         direction += Vec2::new(-1.0, 0.0);
     }
-    if keyboard_input.pressed(KeyCode::KeyA)
+    if keyboard_input.pressed(KeyCode::KeyS)
     {
         direction += Vec2::new(0.0, -1.0);
     }
-    if keyboard_input.pressed(KeyCode::KeyD)
+    if keyboard_input.pressed(KeyCode::KeyW)
     {
         direction += Vec2::new(0.0, 1.0);
     }
@@ -72,10 +72,10 @@ pub fn update_input(
 
     input.sprite_modifier.index = match direction {
         direction if direction.length() > 1. => 1,
-        direction if direction.x == 0. => 2,
-        _ => 0,
+        direction if direction.x == 0. => 0,
+        _ => 2,
     };
 
-    input.sprite_modifier.flip_x = direction.y >= 0.;
-    input.sprite_modifier.flip_y = direction.x < 0.;
+    input.sprite_modifier.flip_x = direction.x >= 0.;
+    input.sprite_modifier.flip_y = direction.y < 0.;
 }
