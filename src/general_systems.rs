@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
+use crate::asteroid::Asteroid;
 use crate::general_components::*;
 use crate::player::Player;
 use crate::wrap::*;
@@ -56,6 +57,20 @@ pub fn startup(
             },
             texture: asset_server.load("background.png"),
             transform: Transform::from_xyz(0., 0., 0.0),
+            ..Default::default()
+        }
+    ));
+    commands.spawn((
+        Asteroid::Attached,
+        Velocity(Vec2::ZERO),
+        Drag(0.95),
+        SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(16.0, 16.0)),
+                ..Default::default()
+            },
+            texture: asset_server.load("asteroid.png"),
+            transform: Transform::from_xyz(0., 0., 1.),
             ..Default::default()
         }
     ));
