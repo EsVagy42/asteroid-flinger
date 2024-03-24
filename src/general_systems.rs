@@ -13,7 +13,7 @@ pub fn startup(
     commands.spawn(
         Camera2dBundle {
             projection: OrthographicProjection {
-                scaling_mode: ScalingMode::AutoMax { max_width: 1024., max_height: 1024. },
+                scaling_mode: ScalingMode::AutoMax { max_width: 512., max_height: 512. },
                 near: -1000.0,
                 far: 1000.0,
                 ..Default::default()
@@ -35,7 +35,7 @@ pub fn startup(
         Drag(0.95),
         SpriteSheetBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(32.0, 32.0)),
+                custom_size: Some(Vec2::new(16.0, 16.0)),
                 ..Default::default()
             },
             texture: asset_server.load("spaceship.png"),
