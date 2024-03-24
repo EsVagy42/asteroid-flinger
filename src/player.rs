@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{input::GameInput, Velocity};
 
-const PLAYER_SPEED: f32 = 10.;
+const PLAYER_SPEED: f32 = 100.;
 
 #[derive(Component)]
 pub struct Player;
@@ -17,5 +17,5 @@ pub fn update_player(
     let (mut sprite, mut texture_atlas, mut velocity) = player_query.single_mut();
     input.sprite_modifier.apply_to_sprite(sprite.as_mut());
     input.sprite_modifier.apply_to_atlas(texture_atlas.as_mut());
-    velocity.0 = input.direction * PLAYER_SPEED;
+    velocity.0 += input.direction * PLAYER_SPEED;
 }

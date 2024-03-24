@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 
-fn wrap(vec: Vec3) -> Vec3 {
+pub fn wrap(vec: Vec3) -> Vec3 {
     Vec3::new(
-        (vec.x + 256.).rem_euclid(512.) - 256.,
-        (vec.y + 256.).rem_euclid(512.) - 256.,
-        (vec.z + 256.).rem_euclid(512.) - 256.,
+        (vec.x + 512.).rem_euclid(1024.) - 512.,
+        (vec.y + 512.).rem_euclid(1024.) - 512.,
+        (vec.z + 512.).rem_euclid(1024.) - 512.,
     )
 }
 
@@ -14,6 +14,6 @@ mod wrap_tests {
 
     #[test]
     fn test_vec2() {
-        assert_eq!(wrap(Vec3::new(-256., -256., -256.) - Vec3::new(1., 1., 1.)), Vec3::new(255., 255., 255.));
+        assert_eq!(wrap(Vec3::new(-512., -512., -512.) - Vec3::new(1., 1., 1.)), Vec3::new(511., 511., 511.));
     }
 }

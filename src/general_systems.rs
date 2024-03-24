@@ -1,14 +1,26 @@
 use bevy::prelude::*;
+use bevy::render::camera::ScalingMode;
 
 use crate::general_components::*;
 use crate::player::Player;
+use crate::wrap::*;
 
 pub fn startup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(
+        Camera2dBundle {
+            projection: OrthographicProjection {
+                scaling_mode: ScalingMode::AutoMax { max_width: 1024., max_height: 1024. },
+                near: -1000.0,
+                far: 1000.0,
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    );
 
     let texture_atlas_layout = texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
         Vec2::new(8., 8.),
@@ -20,6 +32,7 @@ pub fn startup(
     commands.spawn((
         Player,
         Velocity(Vec2::ZERO),
+        Drag(0.95),
         SpriteSheetBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(32.0, 32.0)),
@@ -30,8 +43,21 @@ pub fn startup(
                 layout: texture_atlas_layout,
                 index: 0,
             },
+            transform: Transform::from_xyz(0., 0., 1.),
             ..Default::default()
         },
+    ));
+    commands.spawn((
+        Velocity(Vec2::ZERO),
+        SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(2048.0, 2048.0)),
+                ..Default::default()
+            },
+            texture: asset_server.load("background.png"),
+            transform: Transform::from_xyz(0., 0., 0.0),
+            ..Default::default()
+        }
     ));
 }
 
@@ -42,7 +68,8 @@ pub fn apply_velocities(
 ) {
     let player_velocity = player.single();
     for (mut transform, velocity) in query.iter_mut() {
-        transform.translation += ((velocity.0 - player_velocity.0) * time.delta_seconds()).extend(1.0);
+        transform.translation += ((velocity.0 - player_velocity.0) * time.delta_seconds()).extend(0.0);
+        transform.translation = wrap(transform.translation);
     } 
 } 
 
