@@ -1,3 +1,4 @@
+use asteroid::update_asteroid_state;
 use asteroid::update_asteroid_velocity;
 use bevy::prelude::*;
 
@@ -24,6 +25,7 @@ fn main() {
                 apply_velocities,
                 apply_drags,
                 update_asteroid_velocity,
+                update_asteroid_state,
             ),
         )
         .run();

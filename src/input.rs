@@ -3,6 +3,7 @@ use bevy::prelude::*;
 #[derive(Resource)]
 pub struct GameInput {
     pub direction: Vec2,
+    pub just_released: bool,
     pub sprite_modifier: InputSpriteModifier,
 }
 
@@ -10,6 +11,7 @@ impl Default for GameInput {
     fn default() -> Self {
         Self {
             direction: Vec2::ZERO,
+            just_released: false,
             sprite_modifier: InputSpriteModifier::default(),
         }
     }
@@ -47,6 +49,7 @@ pub fn update_input(
     mut input: ResMut<GameInput>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
+    input.just_released = keyboard_input.just_pressed(KeyCode::Space);
     let mut direction = Vec2::ZERO;
     if keyboard_input.pressed(KeyCode::KeyD)
     {
