@@ -8,7 +8,7 @@ const INACTIVATION_SPEED_SQRD: f32 = 1.;
 const ASTEROID_DRAG: f32 = 0.95;
 const DETACHED_ASTEROID_DRAG: f32 = 0.5;
 const ASTEROID_PICKUP_DISTANCE_SQRD: f32 = 32. * 32.;
-const ASTEROID_DETACHMENT_BOOST_MULTIPLIER: f32 = 3.0;
+const ASTEROID_DETACHMENT_BOOST_MULTIPLIER: f32 = 1.5;
 
 #[derive(Component)]
 pub enum Asteroid {
@@ -44,12 +44,12 @@ pub fn update_asteroid_state(
         if let Asteroid::Attached = *asteroid {
             if just_released {
                 *asteroid = Asteroid::Detached;
+                velocity.0 *= ASTEROID_DETACHMENT_BOOST_MULTIPLIER;
                 drag.0 = DETACHED_ASTEROID_DRAG;
             }
         } else {
             if wrap(transform.translation - player_transform.translation).truncate().length_squared() < ASTEROID_PICKUP_DISTANCE_SQRD {
                 *asteroid = Asteroid::Attached;
-                velocity.0 *= ASTEROID_DETACHMENT_BOOST_MULTIPLIER;
                 drag.0 = ASTEROID_DRAG;
             }
             
