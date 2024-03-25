@@ -15,8 +15,8 @@ pub fn startup(
     commands.spawn(Camera2dBundle {
         projection: OrthographicProjection {
             scaling_mode: ScalingMode::AutoMax {
-                max_width: 512.,
-                max_height: 512.,
+                max_width: 1024.,
+                max_height: 1024.,
             },
             near: -1000.0,
             far: 1000.0,
@@ -55,7 +55,7 @@ pub fn startup(
         Velocity(Vec2::ZERO),
         SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(2048.0, 2048.0)),
+                custom_size: Some(Vec2::new(4096.0, 4096.0)),
                 ..Default::default()
             },
             texture: asset_server.load("background.png"),

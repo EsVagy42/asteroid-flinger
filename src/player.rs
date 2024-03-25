@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{input::GameInput, Velocity};
 
-const PLAYER_SPEED: f32 = 100.;
+const PLAYER_SPEED: f32 = 88.;
 
 #[derive(Component)]
 pub struct Player;
