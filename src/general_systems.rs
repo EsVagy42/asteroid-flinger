@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
 use crate::asteroid::Asteroid;
+use crate::collider::*;
 use crate::general_components::*;
 use crate::player::Player;
 use crate::wrap::*;
@@ -11,17 +12,18 @@ pub fn startup(
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    commands.spawn(
-        Camera2dBundle {
-            projection: OrthographicProjection {
-                scaling_mode: ScalingMode::AutoMax { max_width: 512., max_height: 512. },
-                near: -1000.0,
-                far: 1000.0,
-                ..Default::default()
+    commands.spawn(Camera2dBundle {
+        projection: OrthographicProjection {
+            scaling_mode: ScalingMode::AutoMax {
+                max_width: 512.,
+                max_height: 512.,
             },
+            near: -1000.0,
+            far: 1000.0,
             ..Default::default()
-        }
-    );
+        },
+        ..Default::default()
+    });
 
     let texture_atlas_layout = texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
         Vec2::new(8., 8.),
@@ -34,6 +36,7 @@ pub fn startup(
         Player,
         Velocity(Vec2::ZERO),
         Drag(0.95),
+        Collider(CircleCollider { radius: 4.0 }),
         SpriteSheetBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(16.0, 16.0)),
@@ -58,12 +61,13 @@ pub fn startup(
             texture: asset_server.load("background.png"),
             transform: Transform::from_xyz(0., 0., 0.0),
             ..Default::default()
-        }
+        },
     ));
     commands.spawn((
         Asteroid::Attached,
         Velocity(Vec2::ZERO),
         Drag(0.95),
+        Collider(CircleCollider { radius: 12.0 }),
         SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(16.0, 16.0)),
@@ -72,7 +76,7 @@ pub fn startup(
             texture: asset_server.load("asteroid.png"),
             transform: Transform::from_xyz(0., 0., 1.),
             ..Default::default()
-        }
+        },
     ));
 }
 
@@ -83,15 +87,13 @@ pub fn apply_velocities(
 ) {
     let player_velocity = player.single();
     for (mut transform, velocity) in query.iter_mut() {
-        transform.translation += ((velocity.0 - player_velocity.0) * time.delta_seconds()).extend(0.0);
+        transform.translation +=
+            ((velocity.0 - player_velocity.0) * time.delta_seconds()).extend(0.0);
         transform.translation = wrap(transform.translation);
-    } 
-} 
+    }
+}
 
-pub fn apply_drags(
-    mut query: Query<(&mut Velocity, &Drag)>,
-    time: Res<Time>,
-) {
+pub fn apply_drags(mut query: Query<(&mut Velocity, &Drag)>, time: Res<Time>) {
     for (mut velocity, drag) in query.iter_mut() {
         velocity.0 *= f32::powf(1. - drag.0, time.delta_seconds());
     }

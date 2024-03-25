@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 use crate::{general_components::*, input::GameInput, player::Player};
+use crate::wrap::*;
 
 const ASTEROID_GRAVITY_SCALE: f32 = 100.;
 const ASTEROID_REPULSION_SCALE: f32 = 2500.;
 const INACTIVATION_SPEED_SQRD: f32 = 1.;
 const ASTEROID_DRAG: f32 = 0.95;
 const DETACHED_ASTEROID_DRAG: f32 = 0.5;
+const ASTEROID_PICKUP_DISTANCE_SQRD: f32 = 24. * 24.;
 
 #[derive(Component)]
 pub enum Asteroid {
@@ -16,7 +18,7 @@ pub enum Asteroid {
 
 pub fn update_asteroid_velocity(
     mut query: Query<(&Asteroid, &Transform, &mut Velocity)>,
-    mut player_query: Query<& Transform, With<Player>>,
+    player_query: Query<& Transform, With<Player>>,
     time: Res<Time>,
 ) {
     let player_transform = player_query.single();
@@ -44,7 +46,7 @@ pub fn update_asteroid_state(
                 drag.0 = DETACHED_ASTEROID_DRAG;
             }
         } else {
-            if false { //replace this with collision test
+            if wrap(transform.translation - player_transform.translation).truncate().length_squared() < ASTEROID_PICKUP_DISTANCE_SQRD {
                 *asteroid = Asteroid::Attached;
                 drag.0 = ASTEROID_DRAG;
             }

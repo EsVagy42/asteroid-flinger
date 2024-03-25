@@ -8,6 +8,7 @@ mod general_systems;
 mod input;
 mod player;
 mod wrap;
+mod collider;
 
 use crate::general_components::*;
 use crate::general_systems::*;
