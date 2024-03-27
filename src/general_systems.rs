@@ -4,6 +4,7 @@ use bevy::render::camera::ScalingMode;
 use crate::game_components::{collider::*, components::*, wrap::*};
 use crate::player::*;
 use crate::asteroid::*;
+use crate::player::*;
 
 pub fn startup(
     mut commands: Commands,
@@ -33,7 +34,7 @@ pub fn startup(
     commands.spawn((
         Player,
         Velocity(Vec2::ZERO),
-        Drag(0.95),
+        Drag(crate::player::PLAYER_DRAG),
         Collider(CircleCollider { radius: 4.0 }),
         SpriteSheetBundle {
             sprite: Sprite {
@@ -64,7 +65,7 @@ pub fn startup(
     commands.spawn((
         Asteroid::Attached,
         Velocity(Vec2::ZERO),
-        Drag(0.95),
+        Drag(crate::asteroid::ASTEROID_DRAG),
         Collider(CircleCollider { radius: 12.0 }),
         SpriteBundle {
             sprite: Sprite {

@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 
+const MODULO: f32 = 2048.;
+const MODULO_HALF: f32 = MODULO / 2.;
+
 pub fn wrap(vec: Vec3) -> Vec3 {
     Vec3::new(
-        (vec.x + 1024.).rem_euclid(2048.) - 1024.,
-        (vec.y + 1024.).rem_euclid(2048.) - 1024.,
-        (vec.z + 1024.).rem_euclid(2048.) - 1024.,
+        (vec.x + MODULO_HALF).rem_euclid(MODULO) - MODULO_HALF,
+        (vec.y + MODULO_HALF).rem_euclid(MODULO) - MODULO_HALF,
+        (vec.z + MODULO_HALF).rem_euclid(MODULO) - MODULO_HALF,
     )
 }
 

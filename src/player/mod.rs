@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::game_components::{components::*, input::*};
 
 const PLAYER_SPEED: f32 = 88.;
+pub const PLAYER_DRAG: f32 = 0.95;
 
 #[derive(Component)]
 pub struct Player;
