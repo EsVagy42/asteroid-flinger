@@ -1,5 +1,5 @@
 use bevy::{ecs::component::Component, transform::components::Transform};
-use crate::wrap::*;
+use crate::game_components::wrap::*;
 
 pub struct CircleCollider {
     pub radius: f32,

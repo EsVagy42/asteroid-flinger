@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use crate::{general_components::*, input::GameInput, player::Player};
-use crate::wrap::*;
+use crate::game_components::{components::*, input::*, wrap::*};
+use crate::player::*;
 
 const ASTEROID_GRAVITY_SCALE: f32 = 150.;
 const ASTEROID_REPULSION_SCALE: f32 = 4000.;

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{input::GameInput, Velocity};
+use crate::game_components::{components::*, input::*};
 
 const PLAYER_SPEED: f32 = 88.;
 

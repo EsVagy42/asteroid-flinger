@@ -1,27 +1,23 @@
-use asteroid::update_asteroid_state;
-use asteroid::update_asteroid_velocity;
 use bevy::prelude::*;
 
-mod asteroid;
-mod general_components;
-mod general_systems;
-mod input;
+mod game_components;
 mod player;
-mod wrap;
-mod collider;
+mod asteroid;
+mod general_systems;
 
-use crate::general_components::*;
-use crate::general_systems::*;
+use game_components::input::*;
+use general_systems::*;
+use asteroid::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-        .insert_resource(input::GameInput::default())
+        .insert_resource(GameInput::default())
         .add_systems(Startup, startup)
         .add_systems(
             Update,
             (
-                input::update_input,
+                update_input,
                 player::update_player,
                 apply_velocities,
                 apply_drags,

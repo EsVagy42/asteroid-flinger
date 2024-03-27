@@ -1,11 +1,9 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
-use crate::asteroid::Asteroid;
-use crate::collider::*;
-use crate::general_components::*;
-use crate::player::Player;
-use crate::wrap::*;
+use crate::game_components::{collider::*, components::*, wrap::*};
+use crate::player::*;
+use crate::asteroid::*;
 
 pub fn startup(
     mut commands: Commands,
