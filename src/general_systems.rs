@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
+use crate::asteroid::*;
 use crate::game_components::{collider::*, components::*, wrap::*};
 use crate::player::*;
-use crate::asteroid::*;
 use crate::player::*;
 
 pub fn startup(
