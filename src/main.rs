@@ -13,6 +13,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .insert_resource(GameInput::default())
         .add_systems(Startup, startup)
+        .add_systems(Update, player::update_player_sprite)
         .add_systems(
             FixedUpdate,
             (
