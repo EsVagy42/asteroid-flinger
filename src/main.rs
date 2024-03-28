@@ -1,13 +1,12 @@
 use bevy::prelude::*;
 
-mod game_components;
-mod player;
 mod asteroid;
+mod game_components;
 mod general_systems;
+mod player;
 
 use game_components::input::*;
 use general_systems::*;
-use asteroid::*;
 
 fn main() {
     App::new()
@@ -15,14 +14,14 @@ fn main() {
         .insert_resource(GameInput::default())
         .add_systems(Startup, startup)
         .add_systems(
-            Update,
+            FixedUpdate,
             (
                 update_input,
                 player::update_player,
                 apply_velocities,
                 apply_drags,
-                update_asteroid_velocity,
-                update_asteroid_state,
+                asteroid::update_asteroid_velocity,
+                asteroid::update_asteroid_state,
             ),
         )
         .run();

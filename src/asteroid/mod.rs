@@ -2,11 +2,11 @@ use bevy::prelude::*;
 use crate::game_components::{components::*, input::*, wrap::*};
 use crate::player::*;
 
-const ASTEROID_GRAVITY_SCALE: f32 = 2.5;
-const ASTEROID_REPULSION_SCALE: f32 = 70.;
+const ASTEROID_GRAVITY_SCALE: f32 = 0.0390625;
+const ASTEROID_REPULSION_SCALE: f32 = 1.09375;
 const INACTIVATION_SPEED_SQRD: f32 = 1.;
-pub const ASTEROID_DRAG: f32 = 0.95;
-const DETACHED_ASTEROID_DRAG: f32 = 0.5;
+pub const ASTEROID_DRAG: f32 = 0.0457297;
+const DETACHED_ASTEROID_DRAG: f32 = 0.010772;
 const ASTEROID_PICKUP_DISTANCE_SQRD: f32 = 32. * 32.;
 const ASTEROID_DETACHMENT_BOOST_MULTIPLIER: f32 = 1.5;
 

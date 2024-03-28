@@ -82,18 +82,17 @@ pub fn startup(
 pub fn apply_velocities(
     mut query: Query<(&mut Transform, &Velocity), Without<Player>>,
     player: Query<&Velocity, With<Player>>,
-    time: Res<Time>,
 ) {
     let player_velocity = player.single();
     for (mut transform, velocity) in query.iter_mut() {
         transform.translation +=
-            ((velocity.0 - player_velocity.0) * time.delta_seconds()).extend(0.0);
+            (velocity.0 - player_velocity.0).extend(0.0);
         transform.translation = wrap(transform.translation);
     }
 }
 
-pub fn apply_drags(mut query: Query<(&mut Velocity, &Drag)>, time: Res<Time>) {
+pub fn apply_drags(mut query: Query<(&mut Velocity, &Drag)>) {
     for (mut velocity, drag) in query.iter_mut() {
-        velocity.0 *= f32::powf(1. - drag.0, time.delta_seconds());
+        velocity.0 *= 1. - drag.0;
     }
 }
