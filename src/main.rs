@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
 mod asteroid;
+mod enemies;
 mod game_components;
 mod general_systems;
+mod movement;
 mod player;
 
 use game_components::input::*;
@@ -23,6 +25,13 @@ fn main() {
                 apply_drags,
                 asteroid::update_asteroid_velocity,
                 asteroid::update_asteroid_state,
+            ),
+        )
+        .add_systems(
+            FixedUpdate,
+            (
+                movement::approach_player::apply,
+                movement::follow_player::apply,
             ),
         )
         .run();
