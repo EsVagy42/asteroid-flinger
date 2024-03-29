@@ -6,6 +6,7 @@ mod game_components;
 mod general_systems;
 mod movement;
 mod player;
+mod sprite_updater;
 
 use game_components::input::*;
 use general_systems::*;
@@ -15,7 +16,6 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .insert_resource(GameInput::default())
         .add_systems(Startup, startup)
-        .add_systems(Update, player::update_player_sprite)
         .add_systems(
             FixedUpdate,
             (
@@ -36,5 +36,6 @@ fn main() {
                 movement::follow_player::apply,
             ),
         )
+        .add_systems(Update, (sprite_updater::simple_updater::update))
         .run();
 }

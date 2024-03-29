@@ -18,12 +18,3 @@ pub fn update_player(
     let mut acceleration = player_query.single_mut();
     acceleration.0 = input.direction * PLAYER_SPEED;
 }
-
-pub fn update_player_sprite(
-    mut player_query: Query<(&mut Sprite, &mut TextureAtlas), With<Player>>,
-    input: Res<GameInput>,
-) {
-    let (mut sprite, mut texture_atlas) = player_query.single_mut();
-    input.sprite_modifier.apply_to_sprite(sprite.as_mut());
-    input.sprite_modifier.apply_to_atlas(texture_atlas.as_mut());
-}

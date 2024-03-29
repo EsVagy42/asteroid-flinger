@@ -5,7 +5,7 @@ use crate::asteroid::*;
 use crate::enemies::Enemy;
 use crate::game_components::{collider::*, components::*, wrap::*};
 use crate::player::*;
-use crate::player::*;
+use crate::sprite_updater::*;
 
 pub fn startup(
     mut commands: Commands,
@@ -27,13 +27,14 @@ pub fn startup(
 
     let texture_atlas_layout = texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
         Vec2::new(8., 8.),
-        3,
+        8,
         1,
         None,
         None,
     ));
     commands.spawn((
         Player,
+        simple_updater::SimpleUpdater,
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
         Drag(crate::player::PLAYER_DRAG),
