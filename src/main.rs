@@ -25,6 +25,7 @@ fn main() {
                 apply_drags,
                 asteroid::update_asteroid_velocity,
                 asteroid::update_asteroid_state,
+                handle_asteroid_enemy_collision,
             ),
         )
         .add_systems(

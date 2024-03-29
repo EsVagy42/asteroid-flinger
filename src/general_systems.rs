@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 
 use crate::asteroid::*;
+use crate::enemies::Enemy;
 use crate::game_components::{collider::*, components::*, wrap::*};
 use crate::player::*;
 use crate::player::*;
@@ -78,9 +79,11 @@ pub fn startup(
         },
     ));
     commands.spawn((
+        Enemy,
         crate::movement::approach_player::ApproachPlayer {
             speed: 0.0005,
         },
+        Collider(CircleCollider { radius: 8.0 }),
         Velocity(Vec2::ZERO),
         Drag(crate::asteroid::ASTEROID_DRAG),
         SpriteBundle {
@@ -110,5 +113,18 @@ pub fn apply_velocities(
 pub fn apply_drags(mut query: Query<(&mut Velocity, &Drag)>) {
     for (mut velocity, drag) in query.iter_mut() {
         velocity.0 *= 1. - drag.0;
+    }
+}
+
+pub fn handle_asteroid_enemy_collision (
+    mut commands: Commands,
+    enemy_query: Query<(Entity, &Transform, &Collider), With<Enemy>>,
+    asteroid: Query<(&Transform, &Collider), With<Asteroid>>,
+) {
+    let (asteroid_transform, asteroid_collider) = asteroid.single();
+    for (entity, enemy_transform, enemy_collider) in enemy_query.iter() {
+        if check_collision(asteroid_transform, asteroid_collider, enemy_transform, enemy_collider) {
+            commands.entity(entity).despawn();
+        }
     }
 }
