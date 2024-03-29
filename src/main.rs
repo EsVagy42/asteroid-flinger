@@ -21,12 +21,13 @@ fn main() {
             (
                 update_input,
                 player::update_player,
+                apply_acceleration,
                 apply_velocities,
                 apply_drags,
                 asteroid::update_asteroid_velocity,
                 asteroid::update_asteroid_state,
                 handle_asteroid_enemy_collision,
-            ),
+            ).chain(),
         )
         .add_systems(
             FixedUpdate,

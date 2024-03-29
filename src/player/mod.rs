@@ -12,11 +12,11 @@ pub struct Player;
 pub struct PlayerPosition(pub Vec2);
 
 pub fn update_player(
-    mut player_query: Query<&mut Velocity, With<Player>>,
+    mut player_query: Query<&mut Acceleration, With<Player>>,
     input: Res<GameInput>,
 ) {
-    let mut velocity = player_query.single_mut();
-    velocity.0 += input.direction * PLAYER_SPEED;
+    let mut acceleration = player_query.single_mut();
+    acceleration.0 = input.direction * PLAYER_SPEED;
 }
 
 pub fn update_player_sprite(

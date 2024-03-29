@@ -35,6 +35,7 @@ pub fn startup(
     commands.spawn((
         Player,
         Velocity(Vec2::ZERO),
+        Acceleration(Vec2::ZERO),
         Drag(crate::player::PLAYER_DRAG),
         Collider(CircleCollider { radius: 4.0 }),
         SpriteSheetBundle {
@@ -66,6 +67,7 @@ pub fn startup(
     commands.spawn((
         Asteroid::Attached,
         Velocity(Vec2::ZERO),
+        Acceleration(Vec2::ZERO),
         Drag(crate::asteroid::ASTEROID_DRAG),
         Collider(CircleCollider { radius: 12.0 }),
         SpriteBundle {
@@ -85,6 +87,7 @@ pub fn startup(
         },
         Collider(CircleCollider { radius: 8.0 }),
         Velocity(Vec2::ZERO),
+        Acceleration(Vec2::ZERO),
         Drag(crate::asteroid::ASTEROID_DRAG),
         SpriteBundle {
             sprite: Sprite {
@@ -96,6 +99,14 @@ pub fn startup(
             ..Default::default()
         }
     ));
+}
+
+pub fn apply_acceleration(
+    mut query: Query<(&mut Velocity, &Acceleration)>,
+) {
+    for (mut velocity, acceleration) in query.iter_mut() {
+        velocity.0 += acceleration.0;
+    }
 }
 
 pub fn apply_velocities(
