@@ -13,6 +13,6 @@ pub fn apply(
 ) {
     let player_transform = player_query.single();
     for (approach_player, transform, mut velocity) in query.iter_mut() {
-        velocity.0 = ((player_transform.translation - transform.translation).normalize_or_zero() * approach_player.speed).truncate();
+        velocity.0 += ((player_transform.translation - transform.translation).normalize_or_zero() * approach_player.speed).truncate();
     }
 }

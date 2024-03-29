@@ -77,6 +77,22 @@ pub fn startup(
             ..Default::default()
         },
     ));
+    commands.spawn((
+        crate::movement::approach_player::ApproachPlayer {
+            speed: 0.0005,
+        },
+        Velocity(Vec2::ZERO),
+        Drag(crate::asteroid::ASTEROID_DRAG),
+        SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(16.0, 16.0)),
+                ..Default::default()
+            },
+            texture: asset_server.load("sample_enemy.png"),
+            transform: Transform::from_xyz(512.0, 512.0, 1.0),
+            ..Default::default()
+        }
+    ));
 }
 
 pub fn apply_velocities(
