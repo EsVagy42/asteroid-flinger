@@ -4,12 +4,12 @@ use crate::game_components::components::*;
 const MIN_ACCELERATION_SQRD: f32 = 1.;
 
 #[derive(Component)]
-pub struct SimpleUpdater {
+pub struct DirectionalUpdater {
     pub offset: usize,
 }
 
 pub fn update(
-    mut query: Query<(&SimpleUpdater, &Acceleration, &mut TextureAtlas)>,
+    mut query: Query<(&DirectionalUpdater, &Acceleration, &mut TextureAtlas)>,
 ) {
     for (simple_updater, acceleration, mut texture_atlas) in query.iter_mut() {
         if acceleration.0.length_squared() > MIN_ACCELERATION_SQRD {

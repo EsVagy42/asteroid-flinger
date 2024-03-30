@@ -37,6 +37,6 @@ fn main() {
                 movement::follow_player::apply,
             ),
         )
-        .add_systems(Update, (sprite_updater::simple_updater::update))
+        .add_systems(Update, (sprite_updater::directional_updater::update))
         .run();
 }

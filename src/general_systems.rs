@@ -34,7 +34,7 @@ pub fn startup(
     ));
     commands.spawn((
         Player,
-        simple_updater::SimpleUpdater {
+        directional_updater::DirectionalUpdater {
             offset: 0,
         },
         Velocity(Vec2::ZERO),
