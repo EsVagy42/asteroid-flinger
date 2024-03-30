@@ -7,6 +7,9 @@ use crate::game_components::{collider::*, components::*, wrap::*};
 use crate::player::*;
 use crate::sprite_updater::*;
 
+use self::animator::Animator;
+use self::directional_updater::DirectionalUpdater;
+
 pub fn startup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -27,16 +30,14 @@ pub fn startup(
 
     let texture_atlas_layout = texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
         Vec2::new(8., 8.),
-        8,
+        13,
         1,
         None,
         None,
     ));
     commands.spawn((
         Player,
-        directional_updater::DirectionalUpdater {
-            offset: 0,
-        },
+        directional_updater::DirectionalUpdater { offset: 0 },
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
         Drag(crate::player::PLAYER_DRAG),
@@ -85,9 +86,7 @@ pub fn startup(
     ));
     commands.spawn((
         Enemy,
-        crate::movement::approach_player::ApproachPlayer {
-            speed: 0.0005,
-        },
+        crate::movement::approach_player::ApproachPlayer { speed: 0.0005 },
         Collider(CircleCollider { radius: 8.0 }),
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
@@ -100,13 +99,11 @@ pub fn startup(
             texture: asset_server.load("sample_enemy.png"),
             transform: Transform::from_xyz(512.0, 512.0, 1.0),
             ..Default::default()
-        }
+        },
     ));
 }
 
-pub fn apply_acceleration(
-    mut query: Query<(&mut Velocity, &Acceleration)>,
-) {
+pub fn apply_acceleration(mut query: Query<(&mut Velocity, &Acceleration)>) {
     for (mut velocity, acceleration) in query.iter_mut() {
         velocity.0 += acceleration.0;
     }
@@ -118,8 +115,7 @@ pub fn apply_velocities(
 ) {
     let player_velocity = player.single();
     for (mut transform, velocity) in query.iter_mut() {
-        transform.translation +=
-            (velocity.0 - player_velocity.0).extend(0.0);
+        transform.translation += (velocity.0 - player_velocity.0).extend(0.0);
         transform.translation = wrap(transform.translation);
     }
 }
@@ -130,28 +126,41 @@ pub fn apply_drags(mut query: Query<(&mut Velocity, &Drag)>) {
     }
 }
 
-pub fn handle_asteroid_enemy_collision (
+pub fn handle_asteroid_enemy_collision(
     mut commands: Commands,
     enemy_query: Query<(Entity, &Transform, &Collider), With<Enemy>>,
     asteroid: Query<(&Transform, &Collider), With<Asteroid>>,
 ) {
     let (asteroid_transform, asteroid_collider) = asteroid.single();
     for (entity, enemy_transform, enemy_collider) in enemy_query.iter() {
-        if check_collision(asteroid_transform, asteroid_collider, enemy_transform, enemy_collider) {
+        if check_collision(
+            asteroid_transform,
+            asteroid_collider,
+            enemy_transform,
+            enemy_collider,
+        ) {
             commands.entity(entity).despawn();
         }
     }
 }
 
-pub fn handle_player_enemy_collision (
+pub fn handle_player_enemy_collision(
     mut commands: Commands,
     enemy_query: Query<(&Transform, &Collider), With<Enemy>>,
     player_query: Query<(Entity, &Transform, &Collider), With<Player>>,
 ) {
     let (player, player_transform, player_collider) = player_query.single();
     for (enemy_transform, enemy_collider) in enemy_query.iter() {
-        if check_collision(player_transform, player_collider, enemy_transform, enemy_collider) {
-            commands.entity(player).despawn();
+        if check_collision(
+            player_transform,
+            player_collider,
+            enemy_transform,
+            enemy_collider,
+        ) {
+            commands.entity(player).remove::<DirectionalUpdater>();
+            commands
+                .entity(player)
+                .insert(Animator::new(8, 12, 8, 0.05, false));
         }
     }
 }

@@ -36,7 +36,7 @@ pub fn update (
                     animator.current_index = animator.last_index;
                 }
             }
-            texture_atlas.index = animator.current_index;
         }
+        texture_atlas.index = animator.current_index;
     }
 }
