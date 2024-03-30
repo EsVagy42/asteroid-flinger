@@ -34,7 +34,9 @@ pub fn startup(
     ));
     commands.spawn((
         Player,
-        simple_updater::SimpleUpdater,
+        simple_updater::SimpleUpdater {
+            offset: 0,
+        },
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
         Drag(crate::player::PLAYER_DRAG),
