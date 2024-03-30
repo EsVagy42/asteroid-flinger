@@ -27,6 +27,7 @@ fn main() {
                 asteroid::update_asteroid_velocity,
                 asteroid::update_asteroid_state,
                 handle_asteroid_enemy_collision,
+                handle_player_enemy_collision,
             ).chain(),
         )
         .add_systems(

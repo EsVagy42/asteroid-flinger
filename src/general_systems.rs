@@ -140,3 +140,16 @@ pub fn handle_asteroid_enemy_collision (
         }
     }
 }
+
+pub fn handle_player_enemy_collision (
+    mut commands: Commands,
+    enemy_query: Query<(&Transform, &Collider), With<Enemy>>,
+    player_query: Query<(Entity, &Transform, &Collider), With<Player>>,
+) {
+    let (player, player_transform, player_collider) = player_query.single();
+    for (enemy_transform, enemy_collider) in enemy_query.iter() {
+        if check_collision(player_transform, player_collider, enemy_transform, enemy_collider) {
+            commands.entity(player).despawn();
+        }
+    }
+}
