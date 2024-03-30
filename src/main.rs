@@ -28,7 +28,8 @@ fn main() {
                 asteroid::update_asteroid_state,
                 handle_asteroid_enemy_collision,
                 handle_player_enemy_collision,
-            ).chain(),
+            )
+                .chain(),
         )
         .add_systems(
             FixedUpdate,
@@ -37,6 +38,12 @@ fn main() {
                 movement::follow_player::apply,
             ),
         )
-        .add_systems(Update, (sprite_updater::directional_updater::update))
+        .add_systems(
+            Update,
+            (
+                sprite_updater::directional_updater::update,
+                sprite_updater::animator::update,
+            ),
+        )
         .run();
 }
