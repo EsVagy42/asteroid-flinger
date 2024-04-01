@@ -20,7 +20,6 @@ fn main() {
             FixedUpdate,
             (
                 update_input,
-                player::update_player,
                 apply_acceleration,
                 apply_velocities,
                 apply_drags,
@@ -36,6 +35,7 @@ fn main() {
             (
                 movement::approach_player::apply,
                 movement::follow_player::apply,
+                movement::input_movement::apply,
             ),
         )
         .add_systems(

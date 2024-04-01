@@ -4,6 +4,7 @@ use bevy::render::camera::ScalingMode;
 use crate::asteroid::*;
 use crate::enemies::Enemy;
 use crate::game_components::{collider::*, components::*, wrap::*};
+use crate::movement::input_movement;
 use crate::player::*;
 use crate::sprite_updater::*;
 
@@ -37,6 +38,9 @@ pub fn startup(
     ));
     commands.spawn((
         Player,
+        input_movement::InputMovement {
+            speed: crate::player::PLAYER_SPEED,
+        },
         directional_updater::DirectionalUpdater { offset: 0 },
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
