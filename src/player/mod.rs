@@ -8,9 +8,6 @@ pub const PLAYER_DRAG: f32 = 0.0457297;
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Resource)]
-pub struct PlayerPosition(pub Vec2);
-
 pub fn update_player(
     mut player_query: Query<&mut Acceleration, With<Player>>,
     input: Res<GameInput>,
