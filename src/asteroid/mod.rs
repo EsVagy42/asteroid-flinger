@@ -1,5 +1,5 @@
 use crate::{
-    game::components::{Position, Velocity},
+    game::components::{Acceleration, Position, Velocity, Drag},
     input::JustReleasingEvent,
     player,
 };
@@ -50,21 +50,24 @@ fn check_asteroid_becoming_attached(
     }
 }
 
-fn on_asteroid_attached(mut commands: Commands, asteroid_query: Query<Entity, With<Asteroid>>) {
-    let asteroid = asteroid_query.single();
+fn on_asteroid_attached(mut commands: Commands, mut asteroid_query: Query<(Entity, &mut Drag), With<Asteroid>>) {
+    let (asteroid, mut drag) = asteroid_query.single_mut();
     commands
         .entity(asteroid)
         .insert(crate::movement::asteroid_movement::AsteroidMovement {
             gravity_multiplier: ASTEROID_GRAVITY_MULTIPLIER,
             repulsion_multiplier: ASTEROID_REPULSION_MULTIPLIER,
         });
+    drag.0 = ASTEROID_DRAG;
 }
 
-fn on_asteroid_detached(mut commands: Commands, asteroid_query: Query<Entity, With<Asteroid>>) {
-    let asteroid = asteroid_query.single();
+fn on_asteroid_detached(mut commands: Commands, mut asteroid_query: Query<(Entity, &mut Acceleration, &mut Drag), With<Asteroid>>) {
+    let (asteroid, mut acceleration, mut drag) = asteroid_query.single_mut();
     commands
         .entity(asteroid)
         .remove::<crate::movement::asteroid_movement::AsteroidMovement>();
+    acceleration.0 = Vec2::ZERO;
+    drag.0 = DETACHED_ASTEROID_DRAG;
 }
 
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
