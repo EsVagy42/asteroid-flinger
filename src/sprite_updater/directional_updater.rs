@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::game_components::components::*;
+use crate::game::components::Acceleration;
 
 const MIN_ACCELERATION_SQRD: f32 = 1.;
 
@@ -13,7 +13,16 @@ pub fn update(
 ) {
     for (simple_updater, acceleration, mut texture_atlas) in query.iter_mut() {
         if acceleration.0.length_squared() > MIN_ACCELERATION_SQRD {
-            texture_atlas.index = ((acceleration.0.to_angle() + std::f32::consts::PI + 0.3927) / 0.7854) as usize % 8 + simple_updater.offset;
+            texture_atlas.index = ((acceleration.0.to_angle() + std::f32::consts::PI + (std::f32::consts::PI / 8.)) / (std::f32::consts::PI / 4.)) as usize % 8 + simple_updater.offset;
         }
+    }
+}
+
+pub struct DirectionalUpdaterPlugin;
+
+impl Plugin for DirectionalUpdaterPlugin {
+    fn build(&self, app: &mut App) {
+        app
+            .add_systems(Update, update);
     }
 }

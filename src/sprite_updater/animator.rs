@@ -10,11 +10,11 @@ pub struct Animator {
 }
 
 impl Animator {
-    pub fn new(first_index: usize, last_index: usize, current_index: usize, delay: f32, looping: bool) -> Self {
+    pub fn new(first_index: usize, last_index: usize, delay: f32, looping: bool) -> Self {
         Animator {
             first_index,
             last_index,
-            current_index,
+            current_index: first_index,
             looping,
             timer: Timer::from_seconds(delay, TimerMode::Repeating),
         }
@@ -38,5 +38,13 @@ pub fn update (
             }
         }
         texture_atlas.index = animator.current_index;
+    }
+}
+
+pub struct AnimatorPlugin;
+
+impl Plugin for AnimatorPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Update, update);
     }
 }
