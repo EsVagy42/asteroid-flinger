@@ -1,10 +1,7 @@
-use bevy::{ecs::schedule::ScheduleLabel, prelude::*};
+use bevy::prelude::*;
 
 pub mod directional_updater;
 pub mod animator;
-
-#[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
-pub struct SpriteUpdaterSchedule;
 
 pub struct SpriteUpdaterPlugin;
 
