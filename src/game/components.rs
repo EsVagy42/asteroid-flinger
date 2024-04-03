@@ -48,10 +48,10 @@ impl Plugin for GameComponentsPlugin {
         game_components_schedule
             .add_systems(
                 (
+                   apply_position,
                    apply_acceleration,
                    apply_drag,
                    apply_velocity,
-                   apply_position,
                 ).chain());
         app.add_schedule(game_components_schedule);
         app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(FixedUpdate, GameComponentsSchedule);
