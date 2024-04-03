@@ -4,11 +4,11 @@ use crate::game::components::Position;
 const MODULO: f32 = 2048.;
 const MODULO_HALF: f32 = MODULO / 2.;
 
-fn wrap_f32(x: f32) -> f32 {
+pub fn wrap_f32(x: f32) -> f32 {
     (x + MODULO_HALF).rem_euclid(MODULO) - MODULO_HALF
 }
 
-fn wrap_vec2(v: Vec2) -> Vec2 {
+pub fn wrap_vec2(v: Vec2) -> Vec2 {
     Vec2::new(wrap_f32(v.x), wrap_f32(v.y))
 }
 
