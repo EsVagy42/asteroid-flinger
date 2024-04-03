@@ -11,7 +11,6 @@ const INACTIVATION_SPEED_SQRD: f32 = 1.;
 pub const ASTEROID_DRAG: f32 = 0.0457297;
 const DETACHED_ASTEROID_DRAG: f32 = 0.010772;
 const ASTEROID_PICKUP_DISTANCE_SQRD: f32 = 32. * 32.;
-const ASTEROID_DETACHMENT_BOOST_MULTIPLIER: f32 = 1.5;
 
 #[derive(Component)]
 pub struct Asteroid;
