@@ -15,11 +15,12 @@ fn apply(
     player_query: Query<&Position, With<Player>>,   
 ) {
     let player_position = player_query.single();
-    let (asteroid_movement, position, mut acceleration) = query.single_mut();
-    let direction = player_position.0 - position.0;
-    acceleration.0 = direction * asteroid_movement.gravity_multiplier;
-    let direction = direction.normalize_or_zero();
-    acceleration.0 -= direction * asteroid_movement.repulsion_multiplier;
+    for (asteroid_movement, position, mut acceleration) in query.iter_mut() {
+        let direction = player_position.0 - position.0;
+        acceleration.0 = direction * asteroid_movement.gravity_multiplier;
+        let direction = direction.normalize_or_zero();
+        acceleration.0 -= direction * asteroid_movement.repulsion_multiplier;
+    }
 }
 
 pub struct AsteroidMovementPlugin;

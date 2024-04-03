@@ -12,39 +12,39 @@ const ASTEROID_DETACHMENT_BOOST_MULTIPLIER: f32 = 1.5;
 #[derive(Component)]
 pub struct Asteroid;
 
-#[derive(States, Debug, Hash, PartialEq, Eq, Clone, Reflect)]
+#[derive(States, Debug, Hash, PartialEq, Eq, Clone, Reflect, Default)]
 pub enum AsteroidState {
+    #[default]
     Attached,
     Flying,
     Inactive,
 }
 
 fn asteroid_becoming_detached(
-    _: EventReader<JustReleasingEvent>,
-    mut state: ResMut<State<AsteroidState>>,
+    mut asteroid_state: ResMut<NextState<AsteroidState>>,
 ) {
-    state.set(Box::new(AsteroidState::Flying)).unwrap();
+    asteroid_state.set(AsteroidState::Flying);
 }
 
 fn asteroid_becoming_inactive(
     asteroid_query: Query<&Velocity, With<Asteroid>>,
-    mut state: ResMut<State<AsteroidState>>,
+    mut state: ResMut<NextState<AsteroidState>>,
 ) {
     let velocity = asteroid_query.single();
     if velocity.0.length_squared() < INACTIVATION_SPEED_SQRD {
-        state.set(Box::new(AsteroidState::Inactive)).unwrap();
+        state.set(AsteroidState::Inactive);
     }
 }
 
 fn asteroid_becoming_attached(
     asteroid_query: Query<&Position, With<Asteroid>>,
     player_query: Query<&Position, With<player::Player>>,
-    mut state: ResMut<State<AsteroidState>>,
+    mut state: ResMut<NextState<AsteroidState>>,
 ) {
     let position = asteroid_query.single();
     let player_position = player_query.single();
     if position.0.distance_squared(player_position.0) < ASTEROID_PICKUP_DISTANCE_SQRD {
-        state.set(Box::new(AsteroidState::Attached)).unwrap();
+        state.set(AsteroidState::Attached);
     }
 }
 
@@ -82,7 +82,7 @@ impl Plugin for AsteroidPlugin {
         asteroid_schedule.add_systems(
             (
                 asteroid_becoming_attached.run_if(|state: Res<State<AsteroidState>>| *state != AsteroidState::Attached),
-                asteroid_becoming_detached.run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Attached),
+                asteroid_becoming_detached.run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Attached).run_if(on_event::<JustReleasingEvent>()),
                 asteroid_becoming_inactive.run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Flying),
             )
         );
