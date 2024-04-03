@@ -1,6 +1,9 @@
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
 
 pub mod input_movement;
+pub mod approach_player;
+pub mod follow_player;
+pub mod asteroid_movement;
 
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
 pub struct MovementSchedule;
@@ -15,6 +18,9 @@ impl Plugin for MovementPlugin {
         
         app.add_plugins((
             input_movement::InputMovementPlugin,
+            approach_player::ApproachPlayerPlugin,
+            follow_player::FollowPlayerPlugin,
+            asteroid_movement::AsteroidMovementPlugin,
         ));
     }
 }

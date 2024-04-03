@@ -1,14 +1,25 @@
 use bevy::prelude::*;
 
+mod asteroid;
 mod game;
 mod input;
-mod sprite_updater;
 mod movement;
 mod player;
-mod asteroid;
+mod sprite_updater;
+mod startup;
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, game::GamePlugin, input::InputPlugin, sprite_updater::SpriteUpdaterPlugin, movement::MovementPlugin, player::PlayerPlugin))
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins((
+            game::GamePlugin,
+            input::InputPlugin,
+            sprite_updater::SpriteUpdaterPlugin,
+            movement::MovementPlugin,
+            player::PlayerPlugin,
+            asteroid::AsteroidPlugin,
+        ))
+        .add_systems(Startup, startup::startup)
         .run();
 }
+

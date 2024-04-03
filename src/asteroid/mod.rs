@@ -1,7 +1,5 @@
-use std::borrow::BorrowMut;
-
-use bevy::prelude::*;
-use crate::{game::components::{Acceleration, Position, Velocity}, input::JustReleasingEvent, player};
+use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
+use crate::{game::components::{Position, Velocity}, input::JustReleasingEvent, player};
 
 const ASTEROID_GRAVITY_MULTIPLIER: f32 = 0.0390625;
 const ASTEROID_REPULSION_MULTIPLIER: f32 = 1.09375;
@@ -21,23 +19,11 @@ pub enum AsteroidState {
     Inactive,
 }
 
-fn update_attached_asteroid_acceleration(
-    mut asteroid_query: Query<(&Position, &mut Acceleration), With<Asteroid>>,
-    player_query: Query<&Position, With<player::Player>>,   
-) {
-    let player_position = player_query.single();
-    let (position, mut acceleration) = asteroid_query.single_mut();
-    let direction = player_position.0 - position.0;
-    acceleration.0 = direction * ASTEROID_GRAVITY_MULTIPLIER;
-    let direction = direction.normalize_or_zero();
-    acceleration.0 -= direction * ASTEROID_REPULSION_MULTIPLIER;
-}
-
 fn asteroid_becoming_detached(
-    input_event: EventReader<JustReleasingEvent>,
+    _: EventReader<JustReleasingEvent>,
     mut state: ResMut<State<AsteroidState>>,
 ) {
-    todo!();
+    state.set(Box::new(AsteroidState::Flying)).unwrap();
 }
 
 fn asteroid_becoming_inactive(
@@ -46,7 +32,7 @@ fn asteroid_becoming_inactive(
 ) {
     let velocity = asteroid_query.single();
     if velocity.0.length_squared() < INACTIVATION_SPEED_SQRD {
-        todo!();
+        state.set(Box::new(AsteroidState::Inactive)).unwrap();
     }
 }
 
@@ -58,6 +44,53 @@ fn asteroid_becoming_attached(
     let position = asteroid_query.single();
     let player_position = player_query.single();
     if position.0.distance_squared(player_position.0) < ASTEROID_PICKUP_DISTANCE_SQRD {
-        todo!();
+        state.set(Box::new(AsteroidState::Attached)).unwrap();
+    }
+}
+
+fn on_asteroid_attached(
+    mut commands: Commands,
+    asteroid_query: Query<Entity, With<Asteroid>>,
+) {
+    let asteroid = asteroid_query.single();
+    commands.entity(asteroid).insert(
+        crate::movement::asteroid_movement::AsteroidMovement {
+            gravity_multiplier: ASTEROID_GRAVITY_MULTIPLIER,
+            repulsion_multiplier: ASTEROID_REPULSION_MULTIPLIER,
+        }
+    );
+}
+
+fn on_asteroid_detached(
+    mut commands: Commands,
+    asteroid_query: Query<Entity, With<Asteroid>>,
+) {
+    let asteroid = asteroid_query.single();
+    commands.entity(asteroid).remove::<crate::movement::asteroid_movement::AsteroidMovement>();
+}
+
+#[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
+pub struct AsteroidSchedule;
+
+pub struct AsteroidPlugin;
+
+impl Plugin for AsteroidPlugin {
+    fn build(&self, app: &mut App) {
+        app.insert_state(AsteroidState::Attached);
+
+        let mut asteroid_schedule = Schedule::new(AsteroidSchedule);
+        asteroid_schedule.add_systems(
+            (
+                asteroid_becoming_attached.run_if(|state: Res<State<AsteroidState>>| *state != AsteroidState::Attached),
+                asteroid_becoming_detached.run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Attached),
+                asteroid_becoming_inactive.run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Flying),
+            )
+        );
+        app.add_schedule(asteroid_schedule);
+        app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(FixedUpdate, AsteroidSchedule);
+        
+        app.add_systems(OnEnter(AsteroidState::Attached), on_asteroid_attached);
+        app.add_systems(OnEnter(AsteroidState::Flying), on_asteroid_detached);
+        
     }
 }
