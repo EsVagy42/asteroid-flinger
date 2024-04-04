@@ -38,7 +38,7 @@ pub fn startup(
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
         Drag(crate::player::PLAYER_DRAG),
-        CircleCollider { radius: 4.0, handler: None },
+        CircleCollider { radius: 4.0 },
         SpriteSheetBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(16.0, 16.0)),
@@ -72,7 +72,7 @@ pub fn startup(
         Velocity(Vec2::ZERO),
         Acceleration(Vec2::ZERO),
         Drag(crate::asteroid::ASTEROID_DRAG),
-        CircleCollider { radius: 12.0, handler: None },
+        CircleCollider { radius: 12.0 },
         SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(16.0, 16.0)),
