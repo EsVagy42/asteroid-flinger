@@ -102,7 +102,7 @@ pub fn startup(
             atlas: TextureAtlas {
                 layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
                     Vec2::new(8., 8.),
-                    8,
+                    13,
                     1,
                     None,
                     None,

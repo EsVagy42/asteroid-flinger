@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::game::components::Acceleration;
 
-const MIN_ACCELERATION_SQRD: f32 = 1.;
+const MIN_ACCELERATION_SQRD: f32 = 0.0001;
 
 #[derive(Component)]
 pub struct DirectionalUpdater {
