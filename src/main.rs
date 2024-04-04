@@ -7,6 +7,7 @@ mod movement;
 mod player;
 mod sprite_updater;
 mod startup;
+mod enemy;
 
 fn main() {
     App::new()
@@ -18,6 +19,7 @@ fn main() {
             movement::MovementPlugin,
             player::PlayerPlugin,
             asteroid::AsteroidPlugin,
+            enemy::EnemyPlugin,
         ))
         .add_systems(Startup, startup::startup)
         .run();

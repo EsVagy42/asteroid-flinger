@@ -1,5 +1,7 @@
 use crate::game::components::Position;
 use crate::game::wrap;
+use bevy::app::FixedMainScheduleOrder;
+use bevy::ecs::schedule::ScheduleLabel;
 use bevy::prelude::*;
 
 #[derive(Component)]
@@ -16,6 +18,19 @@ impl CircleCollider {
     ) -> bool {
         wrap::wrap_vec2(position.0 - other_position.0).length_squared()
             <= (self.radius + other.radius).powi(2)
+    }
+}
+
+#[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
+pub struct ColliderSchedule;
+
+pub struct ColliderPlugin;
+
+impl Plugin for ColliderPlugin {
+    fn build(&self, app: &mut App) {
+        let mut collider_schedule = Schedule::new(ColliderSchedule);
+        app.add_schedule(collider_schedule);
+        app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(FixedPostUpdate, ColliderSchedule);
     }
 }
 

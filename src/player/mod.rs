@@ -1,5 +1,5 @@
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
-use crate::game::components::Position;
+use crate::game::{collider::CircleCollider, components::Position};
 
 pub const PLAYER_ACCELERATION: f32 = 1.375;
 pub const PLAYER_DRAG: f32 = 0.0457297;
@@ -18,6 +18,18 @@ fn center_player(
     player_position.0 = Vec2::ZERO;
 }
 
+fn check_enemy_collision(
+    player_query: Query<(&CircleCollider, &Position), With<Player>>,
+    enemy_query: Query<(&CircleCollider, &Position), With<crate::enemy::Enemy>>,
+) {
+    let (player_collider, player_position) = player_query.single();
+    for (enemy_collider, enemy_position) in enemy_query.iter() {
+        if player_collider.collides(player_position, enemy_collider, enemy_position) {
+            todo!("The player dies here");
+        }
+    }
+}
+
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
 pub struct PlayerSchedule;
 
@@ -29,5 +41,6 @@ impl Plugin for PlayerPlugin {
         player_schedule.add_systems(center_player);
         app.add_schedule(player_schedule);
         app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(crate::game::components::GameComponentsSchedule, PlayerSchedule);
+        app.add_systems(crate::game::collider::ColliderSchedule, check_enemy_collision);
     }
 }
