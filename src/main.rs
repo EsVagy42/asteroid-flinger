@@ -18,6 +18,7 @@ fn main() {
             movement::MovementPlugin,
             player::PlayerPlugin,
             asteroid::AsteroidPlugin,
+            game::collider::CollisionPlugin,
         ))
         .add_systems(Startup, startup::startup)
         .run();
