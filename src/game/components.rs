@@ -57,3 +57,22 @@ impl Plugin for GameComponentsPlugin {
         app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(FixedUpdate, GameComponentsSchedule);
     }
 }
+
+#[derive(Bundle)]
+pub struct GameComponentsBundle {
+    pub position: Position,
+    pub velocity: Velocity,
+    pub acceleration: Acceleration,
+    pub drag: Drag,
+}
+
+impl GameComponentsBundle {
+    pub fn new(position: Vec2, drag: f32) -> Self {
+        Self {
+            position: Position(position),
+            velocity: Velocity(Vec2::ZERO),
+            acceleration: Acceleration(Vec2::ZERO),
+            drag: Drag(drag),
+        }
+    }
+}

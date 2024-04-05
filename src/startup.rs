@@ -1,5 +1,6 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 
+use crate::enemy::EnemyBundle;
 use crate::game::collider::*;
 use crate::game::components::*;
 
@@ -27,10 +28,7 @@ pub fn startup(
             speed: crate::player::PLAYER_ACCELERATION,
         },
         crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
-        Position(Vec2::ZERO),
-        Velocity(Vec2::ZERO),
-        Acceleration(Vec2::ZERO),
-        Drag(crate::player::PLAYER_DRAG),
+        GameComponentsBundle::new(Vec2::ZERO, crate::player::PLAYER_DRAG),
         CircleCollider { radius: 4.0 },
         SpriteSheetBundle {
             sprite: Sprite {
@@ -67,10 +65,7 @@ pub fn startup(
     ));
     commands.spawn((
         crate::asteroid::Asteroid,
-        Position(Vec2::ZERO),
-        Velocity(Vec2::ZERO),
-        Acceleration(Vec2::ZERO),
-        Drag(crate::asteroid::ASTEROID_DRAG),
+        GameComponentsBundle::new(Vec2::new(0.00001, 0.), crate::asteroid::ASTEROID_DRAG),
         CircleCollider { radius: 12.0 },
         SpriteBundle {
             sprite: Sprite {
@@ -80,26 +75,17 @@ pub fn startup(
             texture: asset_server.load("asteroid.png"),
             transform: Transform::from_xyz(0., 0., 1.),
 
-                
             ..Default::default()
         },
     ));
     commands.spawn((
-        crate::enemy::Enemy,
-        Position(Vec2::new(256., 256.)),
-        Velocity(Vec2::ZERO),
-        Acceleration(Vec2::ZERO),
-        Drag(crate::asteroid::ASTEROID_DRAG),
-        CircleCollider { radius: 8.0 },
-        crate::movement::follow_player::FollowPlayer { speed: 0.05 },
-        crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
-        SpriteSheetBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(16.0, 16.0)),
-                ..Default::default()
-            },
-            texture: asset_server.load("spaceship.png"),
-            atlas: TextureAtlas {
+        EnemyBundle::new(
+            Vec2::new(1024., 0.),
+            0.05,
+            8.,
+            asset_server.load("spaceship.png"),
+            Vec2::new(16.0, 16.0),
+            TextureAtlas {
                 layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
                     Vec2::new(8., 8.),
                     13,
@@ -109,8 +95,8 @@ pub fn startup(
                 )),
                 ..Default::default()
             },
-            transform: Transform::from_xyz(0., 0., 1.),
-            ..Default::default()
-        },
+        ),
+        crate::movement::follow_player::FollowPlayer { speed: 0.05 },
+        crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
     ));
 }
