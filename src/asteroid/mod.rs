@@ -1,5 +1,5 @@
 use crate::{
-    game::components::{Acceleration, Position, Velocity, Drag},
+    game::components::{Acceleration, Drag, Position, Velocity},
     input::JustReleasingEvent,
     player,
 };
@@ -11,6 +11,7 @@ const INACTIVATION_SPEED_SQRD: f32 = 1.;
 pub const ASTEROID_DRAG: f32 = 0.0457297;
 const DETACHED_ASTEROID_DRAG: f32 = 0.010772;
 const ASTEROID_PICKUP_DISTANCE_SQRD: f32 = 32. * 32.;
+const ASTEROID_REATTACHMENT_TIMER: f32 = 0.1;
 
 #[derive(Component)]
 pub struct Asteroid;
@@ -22,6 +23,9 @@ pub enum AsteroidState {
     Flying,
     Inactive,
 }
+
+#[derive(Resource, Default)]
+pub struct AsteroidReattachmentTimer(Timer);
 
 fn asteroid_becoming_detached(mut asteroid_state: ResMut<NextState<AsteroidState>>) {
     asteroid_state.set(AsteroidState::Flying);
@@ -49,7 +53,10 @@ fn check_asteroid_becoming_attached(
     }
 }
 
-fn on_asteroid_attached(mut commands: Commands, mut asteroid_query: Query<(Entity, &mut Drag), With<Asteroid>>) {
+fn on_asteroid_attached(
+    mut commands: Commands,
+    mut asteroid_query: Query<(Entity, &mut Drag), With<Asteroid>>,
+) {
     let (asteroid, mut drag) = asteroid_query.single_mut();
     commands
         .entity(asteroid)
@@ -60,13 +67,25 @@ fn on_asteroid_attached(mut commands: Commands, mut asteroid_query: Query<(Entit
     drag.0 = ASTEROID_DRAG;
 }
 
-fn on_asteroid_detached(mut commands: Commands, mut asteroid_query: Query<(Entity, &mut Acceleration, &mut Drag), With<Asteroid>>) {
+fn on_asteroid_detached(
+    mut commands: Commands,
+    mut asteroid_query: Query<(Entity, &mut Acceleration, &mut Drag), With<Asteroid>>,
+    mut reattachment_timer: ResMut<AsteroidReattachmentTimer>,
+) {
     let (asteroid, mut acceleration, mut drag) = asteroid_query.single_mut();
     commands
         .entity(asteroid)
         .remove::<crate::movement::asteroid_movement::AsteroidMovement>();
     acceleration.0 = Vec2::ZERO;
     drag.0 = DETACHED_ASTEROID_DRAG;
+    reattachment_timer.0 = Timer::from_seconds(ASTEROID_REATTACHMENT_TIMER, TimerMode::Once);
+}
+
+fn update_reattachment_timer(
+    mut reattachment_timer: ResMut<AsteroidReattachmentTimer>,
+    time: Res<Time>,
+) {
+    reattachment_timer.0.tick(time.delta());
 }
 
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
@@ -77,16 +96,22 @@ pub struct AsteroidPlugin;
 impl Plugin for AsteroidPlugin {
     fn build(&self, app: &mut App) {
         app.insert_state(AsteroidState::Attached);
+        app.insert_resource(AsteroidReattachmentTimer(Timer::default()));
 
         let mut asteroid_schedule = Schedule::new(AsteroidSchedule);
         asteroid_schedule.add_systems((
             check_asteroid_becoming_attached
-                .run_if(|state: Res<State<AsteroidState>>| *state != AsteroidState::Attached),
+                .run_if(|state: Res<State<AsteroidState>>| *state != AsteroidState::Attached)
+                .run_if(|reattachment_timer: Res<AsteroidReattachmentTimer>| {
+                    reattachment_timer.0.finished()
+                }),
             asteroid_becoming_detached
                 .run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Attached)
                 .run_if(on_event::<JustReleasingEvent>()),
             check_asteroid_becoming_inactive
                 .run_if(|state: Res<State<AsteroidState>>| *state == AsteroidState::Flying),
+            update_reattachment_timer
+                .run_if(|state: Res<State<AsteroidState>>| *state != AsteroidState::Attached),
         ));
         app.add_schedule(asteroid_schedule);
         app.world
