@@ -5,6 +5,7 @@ use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*
 
 pub const PLAYER_ACCELERATION: f32 = 1.375;
 pub const PLAYER_DRAG: f32 = 0.0457297;
+pub const FLASH_PERIOD: f32 = 0.2;
 
 #[derive(Component)]
 pub struct Player;
@@ -72,13 +73,14 @@ fn update_player_state(
 
 fn on_player_dead(
     mut commands: Commands,
-    mut player_query: Query<(Entity, &mut crate::game::components::Acceleration), With<Player>>,
+    mut player_query: Query<(Entity, &mut crate::game::components::Acceleration, &mut Visibility), With<Player>>,
 ) {
-    let (player, mut acceleration) = player_query.single_mut();
+    let (player, mut acceleration, mut visibility) = player_query.single_mut();
     commands
         .entity(player)
         .remove::<crate::movement::input_movement::InputMovement>();
     acceleration.0 = Vec2::ZERO;
+    visibility.set(Box::new(Visibility::Hidden)).unwrap();
 }
 
 fn on_player_invincible(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
@@ -88,6 +90,20 @@ fn on_player_invincible(mut commands: Commands, player_query: Query<Entity, With
         .insert(crate::movement::input_movement::InputMovement {
             speed: PLAYER_ACCELERATION,
         });
+}
+
+fn on_player_alive(mut player_query: Query<&mut Visibility, With<Player>>) {
+    let mut visibility = player_query.single_mut();
+    visibility.set(Box::new(Visibility::Visible)).unwrap();
+}
+
+fn flash_player_sprite(mut player_query: Query<&mut Visibility, With<Player>>, time: Res<Time>) {
+    let mut visibility = player_query.single_mut();
+    if time.elapsed_seconds() % FLASH_PERIOD < FLASH_PERIOD / 2. {
+        visibility.set(Box::new(Visibility::Hidden)).unwrap();
+    } else {
+        visibility.set(Box::new(Visibility::Visible)).unwrap();
+    }
 }
 
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
@@ -126,6 +142,8 @@ impl Plugin for PlayerPlugin {
             OnEnter(PlayerState::Invincible),
             (set_player_state_timer, on_player_invincible),
         );
+        app.add_systems(OnEnter(PlayerState::Alive), on_player_alive);
+        app.add_systems(Update, flash_player_sprite.run_if(|state: Res<State<PlayerState>>| *state == PlayerState::Invincible));
 
         app.add_systems(
             Startup,
