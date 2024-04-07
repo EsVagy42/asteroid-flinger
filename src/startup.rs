@@ -23,34 +23,6 @@ pub fn startup(
     });
 
     commands.spawn((
-        crate::player::Player,
-        crate::movement::input_movement::InputMovement {
-            speed: crate::player::PLAYER_ACCELERATION,
-        },
-        crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
-        GameComponentsBundle::new(Vec2::ZERO, crate::player::PLAYER_DRAG),
-        CircleCollider { radius: 4.0 },
-        SpriteSheetBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(16.0, 16.0)),
-                ..Default::default()
-            },
-            texture: asset_server.load("spaceship.png"),
-            atlas: TextureAtlas {
-                layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
-                    Vec2::new(8., 8.),
-                    13,
-                    1,
-                    None,
-                    None,
-                )),
-                index: 0,
-            },
-            transform: Transform::from_xyz(0., 0., 1.),
-            ..Default::default()
-        },
-    ));
-    commands.spawn((
         Position(Vec2::ZERO),
         Velocity(Vec2::ZERO),
         SpriteBundle {
@@ -60,21 +32,6 @@ pub fn startup(
             },
             texture: asset_server.load("background.png"),
             transform: Transform::from_xyz(0., 0., 0.0),
-            ..Default::default()
-        },
-    ));
-    commands.spawn((
-        crate::asteroid::Asteroid,
-        GameComponentsBundle::new(Vec2::new(0.00001, 0.), crate::asteroid::ASTEROID_DRAG),
-        CircleCollider { radius: 12.0 },
-        SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(16.0, 16.0)),
-                ..Default::default()
-            },
-            texture: asset_server.load("asteroid.png"),
-            transform: Transform::from_xyz(0., 0., 1.),
-
             ..Default::default()
         },
     ));

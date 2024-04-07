@@ -44,7 +44,10 @@ enum PlayerState {
 #[derive(Resource, Default)]
 struct PlayerStateTimer(Timer);
 
-fn set_player_state_timer(next_state: Res<State<PlayerState>>, mut timer: ResMut<PlayerStateTimer>) {
+fn set_player_state_timer(
+    next_state: Res<State<PlayerState>>,
+    mut timer: ResMut<PlayerStateTimer>,
+) {
     timer.0 = match next_state.get() {
         PlayerState::Dead => Timer::from_seconds(2., TimerMode::Once),
         PlayerState::Invincible => Timer::from_seconds(3., TimerMode::Once),
@@ -67,7 +70,10 @@ fn update_player_state(
     }
 }
 
-fn on_player_dead(mut commands: Commands, mut player_query: Query<(Entity, &mut crate::game::components::Acceleration), With<Player>>) {
+fn on_player_dead(
+    mut commands: Commands,
+    mut player_query: Query<(Entity, &mut crate::game::components::Acceleration), With<Player>>,
+) {
     let (player, mut acceleration) = player_query.single_mut();
     commands
         .entity(player)
@@ -119,6 +125,45 @@ impl Plugin for PlayerPlugin {
         app.add_systems(
             OnEnter(PlayerState::Invincible),
             (set_player_state_timer, on_player_invincible),
+        );
+
+        app.add_systems(
+            Startup,
+            |mut commands: Commands,
+             asset_server: Res<AssetServer>,
+             mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>| {
+                commands.spawn((
+                    crate::player::Player,
+                    crate::movement::input_movement::InputMovement {
+                        speed: crate::player::PLAYER_ACCELERATION,
+                    },
+                    crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
+                    crate::game::components::GameComponentsBundle::new(
+                        Vec2::ZERO,
+                        crate::player::PLAYER_DRAG,
+                    ),
+                    CircleCollider { radius: 4.0 },
+                    SpriteSheetBundle {
+                        sprite: Sprite {
+                            custom_size: Some(Vec2::new(16.0, 16.0)),
+                            ..Default::default()
+                        },
+                        texture: asset_server.load("spaceship.png"),
+                        atlas: TextureAtlas {
+                            layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
+                                Vec2::new(8., 8.),
+                                13,
+                                1,
+                                None,
+                                None,
+                            )),
+                            index: 0,
+                        },
+                        transform: Transform::from_xyz(0., 0., 1.),
+                        ..Default::default()
+                    },
+                ));
+            },
         );
     }
 }

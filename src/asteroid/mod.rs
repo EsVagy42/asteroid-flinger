@@ -120,5 +120,29 @@ impl Plugin for AsteroidPlugin {
 
         app.add_systems(OnEnter(AsteroidState::Attached), on_asteroid_attached);
         app.add_systems(OnEnter(AsteroidState::Flying), on_asteroid_detached);
+
+        app.add_systems(
+            Startup,
+            |mut commands: Commands, asset_server: Res<AssetServer>| {
+                commands.spawn((
+                    crate::asteroid::Asteroid,
+                    crate::game::components::GameComponentsBundle::new(
+                        Vec2::new(0.00001, 0.),
+                        crate::asteroid::ASTEROID_DRAG,
+                    ),
+                    crate::game::collider::CircleCollider { radius: 12.0 },
+                    SpriteBundle {
+                        sprite: Sprite {
+                            custom_size: Some(Vec2::new(16.0, 16.0)),
+                            ..Default::default()
+                        },
+                        texture: asset_server.load("asteroid.png"),
+                        transform: Transform::from_xyz(0., 0., 1.),
+
+                        ..Default::default()
+                    },
+                ));
+            },
+        );
     }
 }
