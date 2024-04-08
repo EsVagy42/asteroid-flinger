@@ -1,7 +1,7 @@
 use crate::asteroid::Asteroid;
 use crate::explosion::ExplosionEvent;
 use crate::explosion::*;
-use crate::game::components::{GameComponentsBundle, Position};
+use crate::game::components::{GameComponentsBundle, Position, Velocity};
 use bevy::app::FixedMainScheduleOrder;
 use bevy::ecs::schedule::ScheduleLabel;
 use bevy::prelude::*;
@@ -15,14 +15,16 @@ pub struct Enemy;
 pub struct EnemyDespawnEvent(pub Entity);
 
 fn check_for_destructive_collision(
-    enemy_query: Query<(Entity, &CircleCollider, &Position), With<Enemy>>,
-    query: Query<(&CircleCollider, &Position), Or<(With<Asteroid>, With<Explosion>)>>,
+    mut enemy_query: Query<(Entity, &CircleCollider, &Position, &mut Velocity), With<Enemy>>,
+    query: Query<(&CircleCollider, &Position, &Velocity), (Or<(With<Asteroid>, With<Explosion>)>, Without<Enemy>)>,
     mut explosion_event_writer: EventWriter<ExplosionEvent>,
     mut despawn_event_writer: EventWriter<EnemyDespawnEvent>,
 ) {
-    for (asteroid_collider, asteroid_position) in query.iter() {
-        for (entity, collider, position) in enemy_query.iter() {
-            if collider.collides(position, asteroid_collider, asteroid_position) {
+    for (other_collider, other_position, other_velocity) in query.iter() {
+        for (entity, collider, position, mut velocity) in enemy_query.iter_mut() {
+            if collider.collides(position, other_collider, other_position) {
+                velocity.0 = other_velocity.0;
+
                 explosion_event_writer.send(ExplosionEvent(entity));
                 despawn_event_writer.send(EnemyDespawnEvent(entity));
             }
