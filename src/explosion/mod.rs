@@ -93,8 +93,7 @@ impl Plugin for ExplosionPlugin {
             .resource_mut::<FixedMainScheduleOrder>()
             .insert_after(FixedUpdate, ExplosionSchedule);
 
-        app.add_event::<ExplosionEvent>()
-            .add_systems(FixedUpdate, explode);
+        app.add_event::<ExplosionEvent>();
         app.add_systems(ExplosionSchedule, despawn_explosion);
     }
 }

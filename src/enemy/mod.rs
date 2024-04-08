@@ -1,9 +1,10 @@
+use crate::asteroid::Asteroid;
+use crate::explosion::ExplosionEvent;
+use crate::explosion::*;
+use crate::game::components::{GameComponentsBundle, Position};
 use bevy::app::FixedMainScheduleOrder;
 use bevy::ecs::schedule::ScheduleLabel;
 use bevy::prelude::*;
-use crate::explosion::ExplosionEvent;
-use crate::game::components::{GameComponentsBundle, Position};
-use crate::asteroid::Asteroid;
 
 use crate::game::collider::CircleCollider;
 
@@ -13,25 +14,23 @@ pub struct Enemy;
 #[derive(Event)]
 pub struct EnemyDespawnEvent(pub Entity);
 
-fn check_asteroid_collision(
+fn check_for_destructive_collision(
     enemy_query: Query<(Entity, &CircleCollider, &Position), With<Enemy>>,
-    asteroid_query: Query<(&CircleCollider, &Position), With<Asteroid>>,
+    query: Query<(&CircleCollider, &Position), Or<(With<Asteroid>, With<Explosion>)>>,
     mut explosion_event_writer: EventWriter<ExplosionEvent>,
     mut despawn_event_writer: EventWriter<EnemyDespawnEvent>,
 ) {
-    let (asteroid_collider, asteroid_position) = asteroid_query.single();
-    for (entity, collider, position) in enemy_query.iter() {
-        if collider.collides(position, asteroid_collider, asteroid_position) {
-            explosion_event_writer.send(ExplosionEvent(entity));
-            despawn_event_writer.send(EnemyDespawnEvent(entity));
+    for (asteroid_collider, asteroid_position) in query.iter() {
+        for (entity, collider, position) in enemy_query.iter() {
+            if collider.collides(position, asteroid_collider, asteroid_position) {
+                explosion_event_writer.send(ExplosionEvent(entity));
+                despawn_event_writer.send(EnemyDespawnEvent(entity));
+            }
         }
     }
 }
 
-fn despawn_enemy(
-    mut commands: Commands,
-    mut despawn_event_reader: EventReader<EnemyDespawnEvent>,
-) {
+fn despawn_enemy(mut commands: Commands, mut despawn_event_reader: EventReader<EnemyDespawnEvent>) {
     for event in despawn_event_reader.read() {
         commands.entity(event.0).despawn();
     }
@@ -49,9 +48,14 @@ impl Plugin for EnemyPlugin {
         let mut enemy_despawn_schedule = Schedule::new(EnemyDespawnSchedule);
         enemy_despawn_schedule.add_systems(despawn_enemy);
         app.add_schedule(enemy_despawn_schedule);
-        app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(crate::explosion::ExplosionSchedule, EnemyDespawnSchedule);
+        app.world
+            .resource_mut::<FixedMainScheduleOrder>()
+            .insert_after(crate::explosion::ExplosionSchedule, EnemyDespawnSchedule);
 
-        app.add_systems(crate::game::collider::ColliderSchedule, check_asteroid_collision);
+        app.add_systems(
+            crate::game::collider::ColliderSchedule,
+            check_for_destructive_collision,
+        );
     }
 }
 
@@ -64,11 +68,20 @@ pub struct EnemyBundle {
 }
 
 impl EnemyBundle {
-    pub fn new(position: Vec2, drag: f32, collider_radius: f32, image: Handle<Image>, sprite_size: Vec2, texture_atlas: TextureAtlas) -> Self {
+    pub fn new(
+        position: Vec2,
+        drag: f32,
+        collider_radius: f32,
+        image: Handle<Image>,
+        sprite_size: Vec2,
+        texture_atlas: TextureAtlas,
+    ) -> Self {
         Self {
             enemy: Enemy,
             game_components: GameComponentsBundle::new(position, drag),
-            collider: CircleCollider { radius: collider_radius },
+            collider: CircleCollider {
+                radius: collider_radius,
+            },
             sprite_sheet_bundle: SpriteSheetBundle {
                 sprite: Sprite {
                     custom_size: Some(sprite_size),
@@ -79,6 +92,6 @@ impl EnemyBundle {
                 transform: Transform::from_xyz(0., 0., 1.),
                 ..Default::default()
             },
-        }        
+        }
     }
 }

@@ -2,6 +2,7 @@ use std::default;
 
 use crate::{explosion::ExplosionEvent, game::{collider::CircleCollider, components::Position}};
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
+use crate::explosion::*;
 
 pub const PLAYER_ACCELERATION: f32 = 1.375;
 pub const PLAYER_DRAG: f32 = 0.0457297;
@@ -21,13 +22,13 @@ fn center_player(
     player_position.0 = Vec2::ZERO;
 }
 
-fn check_enemy_collision(
+fn check_destructive_collision(
     player_query: Query<(&CircleCollider, &Position), With<Player>>,
-    enemy_query: Query<(&CircleCollider, &Position), With<crate::enemy::Enemy>>,
+    query: Query<(&CircleCollider, &Position), Or<(With<crate::enemy::Enemy>, With<Explosion>)>>,
     mut next_state: ResMut<NextState<PlayerState>>,
 ) {
     let (player_collider, player_position) = player_query.single();
-    for (enemy_collider, enemy_position) in enemy_query.iter() {
+    for (enemy_collider, enemy_position) in query.iter() {
         if player_collider.collides(player_position, enemy_collider, enemy_position) {
             next_state.set(PlayerState::Dead);
         }
@@ -133,7 +134,7 @@ impl Plugin for PlayerPlugin {
             );
         app.add_systems(
             crate::game::collider::ColliderSchedule,
-            check_enemy_collision
+            check_destructive_collision
                 .run_if(|state: Res<State<PlayerState>>| *state == PlayerState::Alive),
         );
         app.add_systems(
