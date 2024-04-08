@@ -1,6 +1,6 @@
 use std::default;
 
-use crate::game::{collider::CircleCollider, components::Position};
+use crate::{explosion::ExplosionEvent, game::{collider::CircleCollider, components::Position}};
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
 
 pub const PLAYER_ACCELERATION: f32 = 1.375;
@@ -74,6 +74,7 @@ fn update_player_state(
 fn on_player_dead(
     mut commands: Commands,
     mut player_query: Query<(Entity, &mut crate::game::components::Acceleration, &mut Visibility), With<Player>>,
+    mut explosion_event_writer: EventWriter<ExplosionEvent>,
 ) {
     let (player, mut acceleration, mut visibility) = player_query.single_mut();
     commands
@@ -81,6 +82,7 @@ fn on_player_dead(
         .remove::<crate::movement::input_movement::InputMovement>();
     acceleration.0 = Vec2::ZERO;
     visibility.set(Box::new(Visibility::Hidden)).unwrap();
+    explosion_event_writer.send(ExplosionEvent(player));
 }
 
 fn on_player_invincible(mut commands: Commands, player_query: Query<Entity, With<Player>>) {

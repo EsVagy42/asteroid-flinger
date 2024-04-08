@@ -1,4 +1,7 @@
+use bevy::app::FixedMainScheduleOrder;
+use bevy::ecs::schedule::ScheduleLabel;
 use bevy::prelude::*;
+use crate::explosion::ExplosionEvent;
 use crate::game::components::{GameComponentsBundle, Position};
 use crate::asteroid::Asteroid;
 
@@ -7,23 +10,47 @@ use crate::game::collider::CircleCollider;
 #[derive(Component)]
 pub struct Enemy;
 
+#[derive(Event)]
+pub struct EnemyDespawnEvent(pub Entity);
+
 fn check_asteroid_collision(
-    mut commands: Commands,
     enemy_query: Query<(Entity, &CircleCollider, &Position), With<Enemy>>,
     asteroid_query: Query<(&CircleCollider, &Position), With<Asteroid>>,
+    mut explosion_event_writer: EventWriter<ExplosionEvent>,
+    mut despawn_event_writer: EventWriter<EnemyDespawnEvent>,
 ) {
     let (asteroid_collider, asteroid_position) = asteroid_query.single();
     for (entity, collider, position) in enemy_query.iter() {
         if collider.collides(position, asteroid_collider, asteroid_position) {
-            commands.entity(entity).despawn();
+            explosion_event_writer.send(ExplosionEvent(entity));
+            despawn_event_writer.send(EnemyDespawnEvent(entity));
         }
     }
 }
+
+fn despawn_enemy(
+    mut commands: Commands,
+    mut despawn_event_reader: EventReader<EnemyDespawnEvent>,
+) {
+    for event in despawn_event_reader.read() {
+        commands.entity(event.0).despawn();
+    }
+}
+
+#[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
+pub struct EnemyDespawnSchedule;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
+        app.add_event::<EnemyDespawnEvent>();
+
+        let mut enemy_despawn_schedule = Schedule::new(EnemyDespawnSchedule);
+        enemy_despawn_schedule.add_systems(despawn_enemy);
+        app.add_schedule(enemy_despawn_schedule);
+        app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(crate::explosion::ExplosionSchedule, EnemyDespawnSchedule);
+
         app.add_systems(crate::game::collider::ColliderSchedule, check_asteroid_collision);
     }
 }

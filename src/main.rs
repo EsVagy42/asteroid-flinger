@@ -18,10 +18,10 @@ fn main() {
             input::InputPlugin,
             sprite_updater::SpriteUpdaterPlugin,
             movement::MovementPlugin,
+            explosion::ExplosionPlugin,
             player::PlayerPlugin,
             asteroid::AsteroidPlugin,
             enemy::EnemyPlugin,
-            explosion::ExplosionPlugin,
         ))
         .add_systems(Startup, startup::startup)
         .run();
