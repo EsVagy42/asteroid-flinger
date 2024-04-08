@@ -4,9 +4,16 @@ use crate::game::{collider::CircleCollider, components::*};
 
 const EXPLOSION_FRAMES: usize = 2;
 const EXPLOSION_DELAY: f32 = 0.5;
+const EXPLOSION_DESPAWN_TIME: f32 = EXPLOSION_DELAY * EXPLOSION_FRAMES as f32;
+
+#[derive(Component)]
+pub struct Explosion {
+    pub despawn_timer: Timer,
+}
 
 #[derive(Bundle)]
 pub struct ExplosionBundle {
+    pub explosion: Explosion,
     pub game_components: GameComponentsBundle,
     pub collider: CircleCollider,
     pub sprite_sheet_bundle: SpriteSheetBundle,
@@ -28,7 +35,8 @@ fn explode(
             .get(event.0)
             .expect("Entity does not have Position or Velocity components");
         commands.spawn(ExplosionBundle {
-            game_components: GameComponentsBundle {
+                explosion: Explosion { despawn_timer: Timer::from_seconds(EXPLOSION_DESPAWN_TIME, TimerMode::Once) },
+                game_components: GameComponentsBundle {
                 position: Position(position.0),
                 velocity: Velocity(velocity.0),
                 ..Default::default()
@@ -62,6 +70,14 @@ fn explode(
     }
 }
 
+pub fn despawn_explosion(mut commands: Commands, mut query: Query<(Entity, &mut Explosion)>, time: Res<Time>) {
+    for (entity, mut explosion) in query.iter_mut() {
+        if explosion.despawn_timer.tick(time.delta()).just_finished() {
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
 pub struct ExplosionSchedule;
 
@@ -79,5 +95,6 @@ impl Plugin for ExplosionPlugin {
 
         app.add_event::<ExplosionEvent>()
             .add_systems(FixedUpdate, explode);
+        app.add_systems(ExplosionSchedule, despawn_explosion);
     }
 }
