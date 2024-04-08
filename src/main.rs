@@ -8,6 +8,7 @@ mod player;
 mod sprite_updater;
 mod startup;
 mod enemy;
+mod explosion;
 
 fn main() {
     App::new()
@@ -20,6 +21,7 @@ fn main() {
             player::PlayerPlugin,
             asteroid::AsteroidPlugin,
             enemy::EnemyPlugin,
+            explosion::ExplosionPlugin,
         ))
         .add_systems(Startup, startup::startup)
         .run();

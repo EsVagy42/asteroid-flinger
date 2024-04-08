@@ -45,16 +45,19 @@ pub struct GameComponentsPlugin;
 impl Plugin for GameComponentsPlugin {
     fn build(&self, app: &mut App) {
         let mut game_components_schedule = Schedule::new(GameComponentsSchedule);
-        game_components_schedule
-            .add_systems(
-                (
-                   apply_position,
-                   apply_acceleration,
-                   apply_drag,
-                   apply_velocity,
-                ).chain());
+        game_components_schedule.add_systems(
+            (
+                apply_position,
+                apply_acceleration,
+                apply_drag,
+                apply_velocity,
+            )
+                .chain(),
+        );
         app.add_schedule(game_components_schedule);
-        app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(FixedUpdate, GameComponentsSchedule);
+        app.world
+            .resource_mut::<FixedMainScheduleOrder>()
+            .insert_after(FixedUpdate, GameComponentsSchedule);
     }
 }
 
@@ -73,6 +76,17 @@ impl GameComponentsBundle {
             velocity: Velocity(Vec2::ZERO),
             acceleration: Acceleration(Vec2::ZERO),
             drag: Drag(drag),
+        }
+    }
+}
+
+impl Default for GameComponentsBundle {
+    fn default() -> Self {
+        Self {
+            position: Position(Vec2::ZERO),
+            velocity: Velocity(Vec2::ZERO),
+            acceleration: Acceleration(Vec2::ZERO),
+            drag: Drag(0.),
         }
     }
 }
