@@ -39,7 +39,7 @@ pub fn startup(
         for j in 0..20 {
             commands.spawn((
                 EnemyBundle::new(
-                    Vec2::new(1024. + (i as f32) * 16., 0. + (j as f32) * 16.),
+                    Vec2::new(1024. + (i as f32) * 24., 0. + (j as f32) * 24.),
                     0.05,
                     8.,
                     asset_server.load("spaceship.png"),

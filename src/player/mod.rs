@@ -24,7 +24,7 @@ fn center_player(
 
 fn check_destructive_collision(
     player_query: Query<(&CircleCollider, &Position), With<Player>>,
-    query: Query<(&CircleCollider, &Position), Or<(With<crate::enemy::Enemy>, With<Explosion>)>>,
+    query: Query<(&CircleCollider, &Position), With<crate::enemy::Enemy>>,
     mut next_state: ResMut<NextState<PlayerState>>,
 ) {
     let (player_collider, player_position) = player_query.single();
