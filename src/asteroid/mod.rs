@@ -61,7 +61,7 @@ fn check_asteroid_becoming_attached(
 ) {
     let position = asteroid_query.single();
     let player_position = player_query.single();
-    if position.0.distance_squared(player_position.0) < ASTEROID_PICKUP_DISTANCE_SQRD {
+    if (*player_position - *position).length_squared() < ASTEROID_PICKUP_DISTANCE_SQRD {
         state.set(AsteroidState::Attached);
     }
 }

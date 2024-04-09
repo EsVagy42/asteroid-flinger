@@ -37,7 +37,7 @@ fn explode(
         commands.spawn(ExplosionBundle {
                 explosion: Explosion { despawn_timer: Timer::from_seconds(EXPLOSION_DESPAWN_TIME, TimerMode::Once) },
                 game_components: GameComponentsBundle {
-                position: Position(position.0),
+                position: *position,
                 velocity: Velocity(velocity.0),
                 ..Default::default()
             },

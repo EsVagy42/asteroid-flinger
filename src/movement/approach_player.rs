@@ -15,7 +15,7 @@ pub fn apply(
 ) {
     let player_position = player_query.single();
     for (approach_player, position, mut acceleration) in query.iter_mut() {
-        acceleration.0 = (player_position.0 - position.0) * approach_player.speed;
+        acceleration.0 = (*player_position - *position) * approach_player.speed;
     }
 }
 

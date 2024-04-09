@@ -5,7 +5,6 @@ use crate::game::components::{GameComponentsBundle, Position, Velocity};
 use bevy::app::FixedMainScheduleOrder;
 use bevy::ecs::schedule::ScheduleLabel;
 use bevy::prelude::*;
-use crate::game::wrap::wrap_vec2;
 
 use crate::game::collider::CircleCollider;
 
@@ -24,7 +23,7 @@ fn check_for_destructive_collision(
     'enemy_loop: for (entity, collider, position, mut velocity) in enemy_query.iter_mut() {
         for (other_collider, other_position, other_velocity) in query.iter() {
             if collider.collides(position, other_collider, other_position) {
-                let new_velocity = wrap_vec2(position.0 - wrap_vec2(other_position.0 - other_velocity.0)).normalize_or_zero() * other_velocity.0.length();
+                let new_velocity = (*position - (*other_position - other_velocity.0)).normalize_or_zero() * other_velocity.0.length();
                 velocity.0 = new_velocity;
 
                 explosion_event_writer.send(ExplosionEvent(entity));

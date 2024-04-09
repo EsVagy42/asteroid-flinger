@@ -16,7 +16,7 @@ fn apply(
 ) {
     let player_position = player_query.single();
     for (asteroid_movement, position, mut acceleration) in query.iter_mut() {
-        let direction = player_position.0 - position.0;
+        let direction = *player_position - *position;
         acceleration.0 = direction * asteroid_movement.gravity_multiplier;
         let direction = direction.normalize_or_zero();
         acceleration.0 -= direction * asteroid_movement.repulsion_multiplier;

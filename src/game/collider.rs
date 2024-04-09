@@ -1,5 +1,4 @@
 use crate::game::components::Position;
-use crate::game::wrap;
 use bevy::app::FixedMainScheduleOrder;
 use bevy::ecs::schedule::ScheduleLabel;
 use bevy::prelude::*;
@@ -16,7 +15,7 @@ impl CircleCollider {
         other: &CircleCollider,
         other_position: &Position,
     ) -> bool {
-        wrap::wrap_vec2(position.0 - other_position.0).length_squared()
+        (*position - *other_position).length_squared()
             <= (self.radius + other.radius).powi(2)
     }
 }
@@ -28,7 +27,7 @@ pub struct ColliderPlugin;
 
 impl Plugin for ColliderPlugin {
     fn build(&self, app: &mut App) {
-        let mut collider_schedule = Schedule::new(ColliderSchedule);
+        let collider_schedule = Schedule::new(ColliderSchedule);
         app.add_schedule(collider_schedule);
         app.world.resource_mut::<FixedMainScheduleOrder>().insert_after(FixedPostUpdate, ColliderSchedule);
     }
@@ -41,14 +40,14 @@ mod collider_tests {
     #[test]
     fn test_collides() {
         assert!(CircleCollider { radius: 1. }.collides(
-            &Position(Vec2::new(-1024., -1024.)),
+            &Position::new(Vec2::new(-1024., -1024.)),
             &CircleCollider { radius: 1. },
-            &Position(Vec2::new(1023., 1023.))
+            &Position::new(Vec2::new(1023., 1023.))
         ));
         assert!(!CircleCollider { radius: 1. }.collides(
-            &Position(Vec2::new(-1023., -1023.)),
+            &Position::new(Vec2::new(-1023., -1023.)),
             &CircleCollider { radius: 1. },
-            &Position(Vec2::new(1023., 1023.))
+            &Position::new(Vec2::new(1023., 1023.))
         ));
     }
 }

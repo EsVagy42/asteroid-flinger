@@ -1,7 +1,36 @@
+use std::ops::*;
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
+use crate::game::wrap::wrap_vec2;
 
-#[derive(Component)]
-pub struct Position(pub Vec2);
+#[derive(Component, Clone, Copy)]
+pub struct Position(Vec2);
+
+impl Add<Vec2> for Position {
+    type Output = Position;
+    fn add(self, rhs: Vec2) -> Self::Output {
+        Self(wrap_vec2(self.0 + rhs))
+    }
+}
+
+impl Sub<Position> for Position {
+    type Output = Vec2;
+    fn sub(self, rhs: Self) -> Self::Output {
+        wrap_vec2(self.0 - rhs.0)
+    }
+}
+
+impl Sub<Vec2> for Position {
+    type Output = Position;
+    fn sub(self, rhs: Vec2) -> Self::Output {
+        Self(wrap_vec2(self.0 - rhs))
+    }
+}
+
+impl Position {
+    pub fn new(vec: Vec2) -> Self {
+        Self(wrap_vec2(vec))
+    }
+}
 
 #[derive(Component)]
 pub struct Velocity(pub Vec2);

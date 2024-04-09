@@ -1,7 +1,6 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 
 use crate::enemy::EnemyBundle;
-use crate::game::collider::*;
 use crate::game::components::*;
 
 pub fn startup(
@@ -23,7 +22,7 @@ pub fn startup(
     });
 
     commands.spawn((
-        Position(Vec2::ZERO),
+        Position::new(Vec2::new(0., 0.)),
         Velocity(Vec2::ZERO),
         SpriteBundle {
             sprite: Sprite {

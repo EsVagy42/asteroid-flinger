@@ -1,8 +1,5 @@
-use std::default;
-
 use crate::{explosion::ExplosionEvent, game::{collider::CircleCollider, components::Position}};
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
-use crate::explosion::*;
 
 pub const PLAYER_ACCELERATION: f32 = 1.375;
 pub const PLAYER_DRAG: f32 = 0.0457297;
@@ -17,9 +14,9 @@ fn center_player(
 ) {
     let mut player_position = player_query.single_mut();
     for mut position in query.iter_mut() {
-        position.0 -= player_position.0;
+        *position = Position::new(*position - *player_position);
     }
-    player_position.0 = Vec2::ZERO;
+    *player_position = Position::new(Vec2::new(0., 0.));
 }
 
 fn check_destructive_collision(

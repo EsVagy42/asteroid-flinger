@@ -11,7 +11,6 @@ impl Plugin for GamePlugin {
         app
             .add_plugins((
                 components::GameComponentsPlugin,
-                wrap::WrapPlugin,
                 collider::ColliderPlugin,
             ));
     }
