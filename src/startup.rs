@@ -35,8 +35,8 @@ pub fn startup(
             ..Default::default()
         },
     ));
-    for i in 0..10 {
-        for j in 0..10 {
+    for i in 0..20 {
+        for j in 0..20 {
             commands.spawn((
                 EnemyBundle::new(
                     Vec2::new(1024. + (i as f32) * 16., 0. + (j as f32) * 16.),

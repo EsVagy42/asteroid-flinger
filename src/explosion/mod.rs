@@ -2,8 +2,8 @@ use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*
 
 use crate::game::{collider::CircleCollider, components::*};
 
-const EXPLOSION_FRAMES: usize = 2;
-const EXPLOSION_DELAY: f32 = 0.5;
+const EXPLOSION_FRAMES: usize = 8;
+const EXPLOSION_DELAY: f32 = 0.1;
 const EXPLOSION_DESPAWN_TIME: f32 = EXPLOSION_DELAY * EXPLOSION_FRAMES as f32;
 
 #[derive(Component)]
