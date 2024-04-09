@@ -35,25 +35,29 @@ pub fn startup(
             ..Default::default()
         },
     ));
-    commands.spawn((
-        EnemyBundle::new(
-            Vec2::new(1024., 0.),
-            0.05,
-            8.,
-            asset_server.load("spaceship.png"),
-            Vec2::new(16.0, 16.0),
-            TextureAtlas {
-                layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
-                    Vec2::new(8., 8.),
-                    13,
-                    1,
-                    None,
-                    None,
-                )),
-                ..Default::default()
-            },
-        ),
-        crate::movement::follow_player::FollowPlayer { speed: 0.05 },
-        crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
-    ));
+    for i in 0..10 {
+        for j in 0..10 {
+            commands.spawn((
+                EnemyBundle::new(
+                    Vec2::new(1024. + (i as f32) * 16., 0. + (j as f32) * 16.),
+                    0.05,
+                    8.,
+                    asset_server.load("spaceship.png"),
+                    Vec2::new(16.0, 16.0),
+                    TextureAtlas {
+                        layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
+                            Vec2::new(8., 8.),
+                            13,
+                            1,
+                            None,
+                            None,
+                        )),
+                        ..Default::default()
+                    },
+                ),
+                crate::movement::follow_player::FollowPlayer { speed: 0.05 },
+                crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
+            ));
+        }
+    }
 }

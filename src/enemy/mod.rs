@@ -20,13 +20,15 @@ fn check_for_destructive_collision(
     mut explosion_event_writer: EventWriter<ExplosionEvent>,
     mut despawn_event_writer: EventWriter<EnemyDespawnEvent>,
 ) {
-    for (other_collider, other_position, other_velocity) in query.iter() {
-        for (entity, collider, position, mut velocity) in enemy_query.iter_mut() {
+    'enemy_loop: for (entity, collider, position, mut velocity) in enemy_query.iter_mut() {
+        for (other_collider, other_position, other_velocity) in query.iter() {
             if collider.collides(position, other_collider, other_position) {
                 velocity.0 = other_velocity.0;
 
                 explosion_event_writer.send(ExplosionEvent(entity));
                 despawn_event_writer.send(EnemyDespawnEvent(entity));
+                
+                continue 'enemy_loop;
             }
         }
     }
