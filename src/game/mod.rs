@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 pub mod components;
 pub mod collider;
-mod wrap;
+pub mod wrap;
 
 pub struct GamePlugin;
 
