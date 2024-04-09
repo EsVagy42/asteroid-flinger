@@ -12,6 +12,7 @@ pub const ASTEROID_DRAG: f32 = 0.0457297;
 const DETACHED_ASTEROID_DRAG: f32 = 0.010772;
 const ASTEROID_PICKUP_DISTANCE_SQRD: f32 = 32. * 32.;
 const ASTEROID_REATTACHMENT_TIMER: f32 = 0.1;
+const DEAD_PLAYER_DETACHMENT_TIME: f32 = 1.0;
 
 #[derive(Component)]
 pub struct Asteroid;
@@ -27,8 +28,20 @@ pub enum AsteroidState {
 #[derive(Resource, Default)]
 pub struct AsteroidReattachmentTimer(Timer);
 
-fn asteroid_becoming_detached(mut asteroid_state: ResMut<NextState<AsteroidState>>) {
+fn asteroid_becoming_detached(
+    mut asteroid_state: ResMut<NextState<AsteroidState>>,
+    mut reattachment_timer: ResMut<AsteroidReattachmentTimer>,
+) {
     asteroid_state.set(AsteroidState::Flying);
+    reattachment_timer.0 = Timer::from_seconds(ASTEROID_REATTACHMENT_TIMER, TimerMode::Once);
+}
+
+fn detach_asteroid_from_dead_player(
+    mut asteroid_state: ResMut<NextState<AsteroidState>>,
+    mut reattachment_timer: ResMut<AsteroidReattachmentTimer>,
+) {
+    asteroid_state.set(AsteroidState::Flying);
+    reattachment_timer.0 = Timer::from_seconds(DEAD_PLAYER_DETACHMENT_TIME, TimerMode::Once);
 }
 
 fn check_asteroid_becoming_inactive(
@@ -70,7 +83,6 @@ fn on_asteroid_attached(
 fn on_asteroid_detached(
     mut commands: Commands,
     mut asteroid_query: Query<(Entity, &mut Acceleration, &mut Drag), With<Asteroid>>,
-    mut reattachment_timer: ResMut<AsteroidReattachmentTimer>,
 ) {
     let (asteroid, mut acceleration, mut drag) = asteroid_query.single_mut();
     commands
@@ -78,7 +90,6 @@ fn on_asteroid_detached(
         .remove::<crate::movement::asteroid_movement::AsteroidMovement>();
     acceleration.0 = Vec2::ZERO;
     drag.0 = DETACHED_ASTEROID_DRAG;
-    reattachment_timer.0 = Timer::from_seconds(ASTEROID_REATTACHMENT_TIMER, TimerMode::Once);
 }
 
 fn update_reattachment_timer(
@@ -120,6 +131,10 @@ impl Plugin for AsteroidPlugin {
 
         app.add_systems(OnEnter(AsteroidState::Attached), on_asteroid_attached);
         app.add_systems(OnEnter(AsteroidState::Flying), on_asteroid_detached);
+        app.add_systems(
+            OnExit(crate::player::PlayerState::Alive),
+            detach_asteroid_from_dead_player,
+        );
 
         app.add_systems(
             Startup,

@@ -36,7 +36,7 @@ fn check_destructive_collision(
 }
 
 #[derive(States, Debug, Hash, PartialEq, Eq, Clone, Reflect, Default)]
-enum PlayerState {
+pub enum PlayerState {
     #[default]
     Alive,
     Dead,
