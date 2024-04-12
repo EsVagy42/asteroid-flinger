@@ -30,6 +30,14 @@ impl Position {
     pub fn new(vec: Vec2) -> Self {
         Self(wrap_vec2(vec))
     }
+    
+    pub fn get(&self) -> Vec2 {
+        self.0
+    }
+    
+    pub fn get_transform(&self) -> Transform {
+        Transform::from_translation(self.0.extend(0.))
+    }
 }
 
 #[derive(Component)]

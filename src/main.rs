@@ -9,6 +9,7 @@ mod sprite_updater;
 mod startup;
 mod enemy;
 mod explosion;
+mod position_indicator;
 
 fn main() {
     App::new()
@@ -19,6 +20,7 @@ fn main() {
             sprite_updater::SpriteUpdaterPlugin,
             movement::MovementPlugin,
             explosion::ExplosionPlugin,
+            position_indicator::PositionIndicatorPlugin,
             player::PlayerPlugin,
             asteroid::AsteroidPlugin,
             enemy::EnemyPlugin,

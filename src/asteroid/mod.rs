@@ -1,9 +1,9 @@
 use crate::{
     game::components::{Acceleration, Drag, Position, Velocity},
     input::JustReleasingEvent,
-    player,
+    player, position_indicator::CircleIndicator,
 };
-use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
+use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*, render::view::visibility};
 
 const ASTEROID_GRAVITY_MULTIPLIER: f32 = 0.0390625;
 const ASTEROID_REPULSION_MULTIPLIER: f32 = 1.09375;
@@ -99,6 +99,20 @@ fn update_reattachment_timer(
     reattachment_timer.0.tick(time.delta());
 }
 
+fn hide_asteroid_indicator(
+    mut indicator_query: Query<&mut Visibility, With<CircleIndicator>>,
+) {
+    let mut visibility = indicator_query.single_mut();
+    visibility.set(Box::new(Visibility::Hidden)).unwrap();
+}
+
+fn show_asteroid_indicator(
+    mut indicator_query: Query<&mut Visibility, With<CircleIndicator>>,
+) {
+    let mut visibility = indicator_query.single_mut();
+    visibility.set(Box::new(Visibility::Visible)).unwrap();
+}
+
 #[derive(ScheduleLabel, Hash, Debug, Eq, PartialEq, Clone)]
 pub struct AsteroidSchedule;
 
@@ -129,7 +143,8 @@ impl Plugin for AsteroidPlugin {
             .resource_mut::<FixedMainScheduleOrder>()
             .insert_after(FixedUpdate, AsteroidSchedule);
 
-        app.add_systems(OnEnter(AsteroidState::Attached), on_asteroid_attached);
+        app.add_systems(OnEnter(AsteroidState::Attached), (on_asteroid_attached, hide_asteroid_indicator));
+        app.add_systems(OnExit(AsteroidState::Attached), show_asteroid_indicator);
         app.add_systems(OnEnter(AsteroidState::Flying), on_asteroid_detached);
         app.add_systems(
             OnExit(crate::player::PlayerState::Alive),
@@ -139,13 +154,26 @@ impl Plugin for AsteroidPlugin {
         app.add_systems(
             Startup,
             |mut commands: Commands, asset_server: Res<AssetServer>| {
-                commands.spawn((
+                let asteroid_id = commands.spawn((
                     crate::asteroid::Asteroid,
                     crate::game::components::GameComponentsBundle::new(
                         Vec2::new(0.00001, 0.),
                         crate::asteroid::ASTEROID_DRAG,
                     ),
                     crate::game::collider::CircleCollider { radius: 12.0 },
+                    SpriteBundle {
+                        sprite: Sprite {
+                            custom_size: Some(Vec2::new(16.0, 16.0)),
+                            ..Default::default()
+                        },
+                        texture: asset_server.load("asteroid.png"),
+                        transform: Transform::from_xyz(0., 0., 1.),
+
+                        ..Default::default()
+                    },
+                )).id();
+                commands.spawn((
+                    CircleIndicator { radius: 32., entity: asteroid_id },
                     SpriteBundle {
                         sprite: Sprite {
                             custom_size: Some(Vec2::new(16.0, 16.0)),
