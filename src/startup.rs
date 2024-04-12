@@ -2,6 +2,7 @@ use bevy::{prelude::*, render::camera::ScalingMode};
 
 use crate::enemy::EnemyBundle;
 use crate::game::components::*;
+use crate::position_indicator::OffscreenIndicator;
 
 pub fn startup(
     mut commands: Commands,
@@ -36,14 +37,37 @@ pub fn startup(
     ));
     for i in 0..20 {
         for j in 0..20 {
+            let enemy = commands
+                .spawn((
+                    EnemyBundle::new(
+                        Vec2::new(1024. + (i as f32) * 24., 0. + (j as f32) * 24.),
+                        0.05,
+                        8.,
+                        asset_server.load("spaceship.png"),
+                        Vec2::new(16.0, 16.0),
+                        TextureAtlas {
+                            layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
+                                Vec2::new(8., 8.),
+                                13,
+                                1,
+                                None,
+                                None,
+                            )),
+                            ..Default::default()
+                        },
+                    ),
+                    crate::movement::follow_player::FollowPlayer { speed: 0.05 },
+                    crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
+                ))
+                .id();
             commands.spawn((
-                EnemyBundle::new(
-                    Vec2::new(1024. + (i as f32) * 24., 0. + (j as f32) * 24.),
-                    0.05,
-                    8.,
-                    asset_server.load("spaceship.png"),
-                    Vec2::new(16.0, 16.0),
-                    TextureAtlas {
+                OffscreenIndicator { entity: enemy },
+                SpriteSheetBundle {
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(16.0, 16.0)),
+                        ..Default::default()
+                    },
+                    atlas: TextureAtlas {
                         layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
                             Vec2::new(8., 8.),
                             13,
@@ -53,9 +77,10 @@ pub fn startup(
                         )),
                         ..Default::default()
                     },
-                ),
-                crate::movement::follow_player::FollowPlayer { speed: 0.05 },
-                crate::sprite_updater::directional_updater::DirectionalUpdater { offset: 0 },
+                    texture: asset_server.load("spaceship.png"),
+                    transform: Transform::from_xyz(0., 0., 1.),
+                    ..Default::default()
+                },
             ));
         }
     }

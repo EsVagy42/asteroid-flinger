@@ -3,7 +3,7 @@ use crate::{
     input::JustReleasingEvent,
     player, position_indicator::CircleIndicator,
 };
-use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*, render::view::visibility};
+use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
 
 const ASTEROID_GRAVITY_MULTIPLIER: f32 = 0.0390625;
 const ASTEROID_REPULSION_MULTIPLIER: f32 = 1.09375;
