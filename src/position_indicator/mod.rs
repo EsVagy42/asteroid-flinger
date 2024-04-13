@@ -4,17 +4,14 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct PositionIndicator(pub Entity);
 
-#[derive(Event)]
-pub struct IndicatorDespawnEvent(pub Entity);
-
 fn despawn_indicator(
     mut commands: Commands,
-    mut event_reader: EventReader<IndicatorDespawnEvent>,
-    query: Query<Entity>,
+    query: Query<(Entity, &PositionIndicator)>,
+    parent_query: Query<Entity, Without<PositionIndicator>>,
 ) {
-    for event in event_reader.read() {
-        if query.get(event.0).is_ok() {
-            commands.entity(event.0).despawn();
+    for (entity, position_indicator) in query.iter() {
+        if let Err(_) = parent_query.get(position_indicator.0) {
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
@@ -31,17 +28,16 @@ pub struct CircleIndicatorBundle {
 }
 
 fn update_circle_indicator(
-    mut query: Query<(Entity, &PositionIndicator, &CircleIndicator, &mut Transform)>,
+    mut query: Query<(&PositionIndicator, &CircleIndicator, &mut Transform)>,
     parent_query: Query<&Position>,
-    mut despawn_writer: EventWriter<IndicatorDespawnEvent>,
 ) {
-    for (circle_indicator_entity, position_indicator, circle_indicator, mut transform) in query.iter_mut() {
+    for (position_indicator, circle_indicator, mut transform) in
+        query.iter_mut()
+    {
         if let Ok(parent_position) = parent_query.get(position_indicator.0) {
             *transform = Transform::from_translation(
                 (parent_position.get().normalize() * circle_indicator.radius).extend(1.),
             );
-        } else {
-            despawn_writer.send(IndicatorDespawnEvent(circle_indicator_entity));
         }
     }
 }
@@ -57,20 +53,21 @@ pub struct OffscreenIndicatorBundle {
 
 fn update_offscreen_indicator(
     mut query: Query<(
-        Entity,
         &PositionIndicator,
-        &OffscreenIndicator,
         &mut Transform,
         &mut Visibility,
         &Sprite,
-    )>,
+    ), With<OffscreenIndicator>>,
     mut parent_query: Query<&Position>,
     mut camera_query: Query<&Camera>,
-    mut despawn_writer: EventWriter<IndicatorDespawnEvent>,
 ) {
     let camera = camera_query.single_mut();
-    for (offscreen_indicator_entity, position_indicator, offscreen_indicator, mut transform, mut visibility, sprite) in
-        query.iter_mut()
+    for (
+        position_indicator,
+        mut transform,
+        mut visibility,
+        sprite,
+    ) in query.iter_mut()
     {
         if let Ok(position) = parent_query.get_mut(position_indicator.0) {
             let normalized_device_position = camera
@@ -111,8 +108,17 @@ fn update_offscreen_indicator(
                 );
                 *transform = Transform::from_translation(indicator_position_clamped.extend(1.));
             }
-        } else {
-            despawn_writer.send(IndicatorDespawnEvent(offscreen_indicator_entity));
+        }
+    }
+}
+
+fn update_indicator_atlas(
+    mut query: Query<(&PositionIndicator, &mut TextureAtlas)>,
+    parent_query: Query<&TextureAtlas, Without<PositionIndicator>>,
+) {
+    for (position_indicator, mut texture_atlas) in query.iter_mut() {
+        if let Ok(parent_texture_atlas) = parent_query.get(position_indicator.0) {
+            texture_atlas.index = parent_texture_atlas.index;
         }
     }
 }
@@ -121,13 +127,13 @@ pub struct PositionIndicatorPlugin;
 
 impl Plugin for PositionIndicatorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<IndicatorDespawnEvent>();
         app.add_systems(
             Update,
             (
                 despawn_indicator,
                 update_circle_indicator,
                 update_offscreen_indicator,
+                update_indicator_atlas,
             ),
         );
     }
