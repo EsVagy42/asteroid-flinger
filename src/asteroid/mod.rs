@@ -182,7 +182,7 @@ impl Plugin for AsteroidPlugin {
                             custom_size: Some(Vec2::new(16.0, 16.0)),
                             ..Default::default()
                         },
-                        texture: asset_server.load("asteroid.png"),
+                        texture: asset_server.load("asteroid_indicator.png"),
                         transform: Transform::from_xyz(0., 0., 1.),
 
                         ..Default::default()
