@@ -1,6 +1,9 @@
 use crate::game::components::*;
 use bevy::prelude::*;
 
+const INDICATOR_Z_POSITION: f32 = 1.;
+const INDICATOR_OPACITY_DIVIDER: f32 = crate::game::wrap::MODULO_HALF;
+
 #[derive(Component)]
 pub struct PositionIndicator(pub Entity);
 
@@ -36,7 +39,7 @@ fn update_circle_indicator(
     {
         if let Ok(parent_position) = parent_query.get(position_indicator.0) {
             *transform = Transform::from_translation(
-                (parent_position.get().normalize() * circle_indicator.radius).extend(1.),
+                (parent_position.get().normalize() * circle_indicator.radius).extend(INDICATOR_Z_POSITION),
             );
         }
     }
@@ -56,7 +59,7 @@ fn update_offscreen_indicator(
         &PositionIndicator,
         &mut Transform,
         &mut Visibility,
-        &mut Sprite,
+        &Sprite,
     ), With<OffscreenIndicator>>,
     mut parent_query: Query<&Position>,
     mut camera_query: Query<&Camera>,
@@ -66,7 +69,7 @@ fn update_offscreen_indicator(
         position_indicator,
         mut transform,
         mut visibility,
-        mut sprite,
+        sprite,
     ) in query.iter_mut()
     {
         if let Ok(position) = parent_query.get_mut(position_indicator.0) {
@@ -106,10 +109,20 @@ fn update_offscreen_indicator(
                         camera_bounds.y - indicator_half_size.y,
                     ),
                 );
-                *transform = Transform::from_translation(indicator_position_clamped.extend(1.));
-                let opacity = 1. - (f32::max(position.get().x.abs(), position.get().y.abs()) / 1024.);
-                sprite.color.set_a(opacity);
+                *transform = Transform::from_translation(indicator_position_clamped.extend(INDICATOR_Z_POSITION));
             }
+        }
+    }
+}
+
+fn set_indicator_opacity(
+    mut query: Query<(&mut Sprite, &PositionIndicator)>,
+    parent_query: Query<&Position>,
+) {
+    for (mut sprite, position_indicator) in query.iter_mut() {
+        if let Ok(parent_position) = parent_query.get(position_indicator.0) {
+                let opacity = 1. - (f32::max(parent_position.get().x.abs(), parent_position.get().y.abs()) / INDICATOR_OPACITY_DIVIDER);
+                sprite.color.set_a(opacity);
         }
     }
 }
@@ -136,6 +149,7 @@ impl Plugin for PositionIndicatorPlugin {
                 update_circle_indicator,
                 update_offscreen_indicator,
                 update_indicator_atlas,
+                set_indicator_opacity,
             ),
         );
     }

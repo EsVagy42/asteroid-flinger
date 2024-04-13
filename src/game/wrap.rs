@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-const MODULO: f32 = 2048.;
-const MODULO_HALF: f32 = MODULO / 2.;
+pub const MODULO: f32 = 2048.;
+pub const MODULO_HALF: f32 = MODULO / 2.;
 
 pub fn wrap_f32(x: f32) -> f32 {
     (x + MODULO_HALF).rem_euclid(MODULO) - MODULO_HALF
