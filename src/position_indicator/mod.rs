@@ -31,15 +31,22 @@ pub struct CircleIndicatorBundle {
 }
 
 fn update_circle_indicator(
-    mut query: Query<(&PositionIndicator, &CircleIndicator, &mut Transform)>,
+    mut query: Query<(
+        &PositionIndicator,
+        &CircleIndicator,
+        &mut Transform,
+        &Visibility,
+    )>,
     parent_query: Query<&Position>,
 ) {
-    for (position_indicator, circle_indicator, mut transform) in
-        query.iter_mut()
-    {
+    for (position_indicator, circle_indicator, mut transform, visibility) in query.iter_mut() {
+        if let Visibility::Hidden = visibility {
+            continue;
+        }
         if let Ok(parent_position) = parent_query.get(position_indicator.0) {
             *transform = Transform::from_translation(
-                (parent_position.get().normalize() * circle_indicator.radius).extend(INDICATOR_Z_POSITION),
+                (parent_position.get().normalize() * circle_indicator.radius)
+                    .extend(INDICATOR_Z_POSITION),
             );
         }
     }
@@ -55,23 +62,15 @@ pub struct OffscreenIndicatorBundle {
 }
 
 fn update_offscreen_indicator(
-    mut query: Query<(
-        &PositionIndicator,
-        &mut Transform,
-        &mut Visibility,
-        &Sprite,
-    ), With<OffscreenIndicator>>,
+    mut query: Query<
+        (&PositionIndicator, &mut Transform, &mut Visibility, &Sprite),
+        With<OffscreenIndicator>,
+    >,
     mut parent_query: Query<&Position>,
     mut camera_query: Query<&Camera>,
 ) {
     let camera = camera_query.single_mut();
-    for (
-        position_indicator,
-        mut transform,
-        mut visibility,
-        sprite,
-    ) in query.iter_mut()
-    {
+    for (position_indicator, mut transform, mut visibility, sprite) in query.iter_mut() {
         if let Ok(position) = parent_query.get_mut(position_indicator.0) {
             let normalized_device_position = camera
                 .world_to_ndc(
@@ -109,7 +108,9 @@ fn update_offscreen_indicator(
                         camera_bounds.y - indicator_half_size.y,
                     ),
                 );
-                *transform = Transform::from_translation(indicator_position_clamped.extend(INDICATOR_Z_POSITION));
+                *transform = Transform::from_translation(
+                    indicator_position_clamped.extend(INDICATOR_Z_POSITION),
+                );
             }
         }
     }
@@ -121,8 +122,10 @@ fn set_indicator_opacity(
 ) {
     for (mut sprite, position_indicator) in query.iter_mut() {
         if let Ok(parent_position) = parent_query.get(position_indicator.0) {
-                let opacity = 1. - (f32::max(parent_position.get().x.abs(), parent_position.get().y.abs()) / INDICATOR_OPACITY_DIVIDER);
-                sprite.color.set_a(opacity);
+            let opacity = 1.
+                - (f32::max(parent_position.get().x.abs(), parent_position.get().y.abs())
+                    / INDICATOR_OPACITY_DIVIDER);
+            sprite.color.set_a(opacity);
         }
     }
 }
