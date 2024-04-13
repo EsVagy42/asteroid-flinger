@@ -1,7 +1,7 @@
 use crate::{
     game::components::{Acceleration, Drag, Position, Velocity},
     input::JustReleasingEvent,
-    player, position_indicator::CircleIndicator,
+    player, position_indicator::{CircleIndicator, CircleIndicatorBundle, PositionIndicator},
 };
 use bevy::{app::FixedMainScheduleOrder, ecs::schedule::ScheduleLabel, prelude::*};
 
@@ -173,7 +173,10 @@ impl Plugin for AsteroidPlugin {
                     },
                 )).id();
                 commands.spawn((
-                    CircleIndicator { radius: 32., entity: asteroid_id },
+                    CircleIndicatorBundle {
+                        position_indicator: PositionIndicator(asteroid_id),
+                        circle_indicator: CircleIndicator { radius: 32. },
+                    },
                     SpriteBundle {
                         sprite: Sprite {
                             custom_size: Some(Vec2::new(16.0, 16.0)),

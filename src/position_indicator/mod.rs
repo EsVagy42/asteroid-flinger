@@ -1,6 +1,9 @@
 use crate::game::components::*;
 use bevy::prelude::*;
 
+#[derive(Component)]
+pub struct PositionIndicator(pub Entity);
+
 #[derive(Event)]
 pub struct IndicatorDespawnEvent(pub Entity);
 
@@ -18,17 +21,22 @@ fn despawn_indicator(
 
 #[derive(Component)]
 pub struct CircleIndicator {
-    pub entity: Entity,
     pub radius: f32,
 }
 
+#[derive(Bundle)]
+pub struct CircleIndicatorBundle {
+    pub position_indicator: PositionIndicator,
+    pub circle_indicator: CircleIndicator,
+}
+
 fn update_circle_indicator(
-    mut query: Query<(Entity, &CircleIndicator, &mut Transform)>,
+    mut query: Query<(Entity, &PositionIndicator, &CircleIndicator, &mut Transform)>,
     parent_query: Query<&Position>,
     mut despawn_writer: EventWriter<IndicatorDespawnEvent>,
 ) {
-    for (circle_indicator_entity, circle_indicator, mut transform) in query.iter_mut() {
-        if let Ok(parent_position) = parent_query.get(circle_indicator.entity) {
+    for (circle_indicator_entity, position_indicator, circle_indicator, mut transform) in query.iter_mut() {
+        if let Ok(parent_position) = parent_query.get(position_indicator.0) {
             *transform = Transform::from_translation(
                 (parent_position.get().normalize() * circle_indicator.radius).extend(1.),
             );
@@ -39,13 +47,18 @@ fn update_circle_indicator(
 }
 
 #[derive(Component)]
-pub struct OffscreenIndicator {
-    pub entity: Entity,
+pub struct OffscreenIndicator;
+
+#[derive(Bundle)]
+pub struct OffscreenIndicatorBundle {
+    pub position_indicator: PositionIndicator,
+    pub offscreen_indicator: OffscreenIndicator,
 }
 
 fn update_offscreen_indicator(
     mut query: Query<(
         Entity,
+        &PositionIndicator,
         &OffscreenIndicator,
         &mut Transform,
         &mut Visibility,
@@ -56,10 +69,10 @@ fn update_offscreen_indicator(
     mut despawn_writer: EventWriter<IndicatorDespawnEvent>,
 ) {
     let camera = camera_query.single_mut();
-    for (offscreen_indicator_entity, offscreen_indicator, mut transform, mut visibility, sprite) in
+    for (offscreen_indicator_entity, position_indicator, offscreen_indicator, mut transform, mut visibility, sprite) in
         query.iter_mut()
     {
-        if let Ok(position) = parent_query.get_mut(offscreen_indicator.entity) {
+        if let Ok(position) = parent_query.get_mut(position_indicator.0) {
             let normalized_device_position = camera
                 .world_to_ndc(
                     &GlobalTransform::default(),

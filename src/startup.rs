@@ -2,7 +2,7 @@ use bevy::{prelude::*, render::camera::ScalingMode};
 
 use crate::enemy::EnemyBundle;
 use crate::game::components::*;
-use crate::position_indicator::OffscreenIndicator;
+use crate::position_indicator::{OffscreenIndicator, OffscreenIndicatorBundle, PositionIndicator};
 
 pub fn startup(
     mut commands: Commands,
@@ -61,7 +61,10 @@ pub fn startup(
                 ))
                 .id();
             commands.spawn((
-                OffscreenIndicator { entity: enemy },
+                OffscreenIndicatorBundle {
+                    position_indicator: PositionIndicator(enemy),
+                    offscreen_indicator: OffscreenIndicator,
+                },
                 SpriteSheetBundle {
                     sprite: Sprite {
                         custom_size: Some(Vec2::new(16.0, 16.0)),
