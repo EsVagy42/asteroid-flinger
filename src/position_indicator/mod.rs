@@ -56,7 +56,7 @@ fn update_offscreen_indicator(
         &PositionIndicator,
         &mut Transform,
         &mut Visibility,
-        &Sprite,
+        &mut Sprite,
     ), With<OffscreenIndicator>>,
     mut parent_query: Query<&Position>,
     mut camera_query: Query<&Camera>,
@@ -66,7 +66,7 @@ fn update_offscreen_indicator(
         position_indicator,
         mut transform,
         mut visibility,
-        sprite,
+        mut sprite,
     ) in query.iter_mut()
     {
         if let Ok(position) = parent_query.get_mut(position_indicator.0) {
@@ -107,6 +107,8 @@ fn update_offscreen_indicator(
                     ),
                 );
                 *transform = Transform::from_translation(indicator_position_clamped.extend(1.));
+                let opacity = 1. - (f32::max(position.get().x.abs(), position.get().y.abs()) / 1024.);
+                sprite.color.set_a(opacity);
             }
         }
     }
