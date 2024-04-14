@@ -167,7 +167,7 @@ impl Plugin for AsteroidPlugin {
                             ..Default::default()
                         },
                         texture: asset_server.load("asteroid.png"),
-                        transform: Transform::from_xyz(0., 0., 1.),
+                        transform: Transform::from_xyz(0., 0., 9.),
 
                         ..Default::default()
                     },

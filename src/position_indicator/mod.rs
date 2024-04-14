@@ -1,7 +1,7 @@
 use crate::game::components::*;
 use bevy::prelude::*;
 
-const INDICATOR_Z_POSITION: f32 = 1.;
+const INDICATOR_Z_POSITION: f32 = 900.;
 const INDICATOR_OPACITY_DIVIDER: f32 = crate::game::wrap::MODULO_HALF;
 
 #[derive(Component)]

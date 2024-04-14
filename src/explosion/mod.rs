@@ -58,6 +58,7 @@ fn explode(
                     )),
                     index: 0,
                 },
+                transform: Transform::from_xyz(0., 0., 2.),
                 ..Default::default()
             },
             animator: crate::sprite_updater::animator::Animator::new(

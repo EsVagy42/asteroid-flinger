@@ -177,7 +177,7 @@ impl Plugin for PlayerPlugin {
                             )),
                             index: 0,
                         },
-                        transform: Transform::from_xyz(0., 0., 1.),
+                        transform: Transform::from_xyz(0., 0., 10.),
                         ..Default::default()
                     },
                 ));
