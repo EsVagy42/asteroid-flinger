@@ -157,7 +157,7 @@ impl Plugin for AsteroidPlugin {
                 let asteroid_id = commands.spawn((
                     crate::asteroid::Asteroid,
                     crate::game::components::GameComponentsBundle::new(
-                        Vec2::new(0.00001, 0.),
+                        Vec2::new(0.01, 0.),
                         crate::asteroid::ASTEROID_DRAG,
                     ),
                     crate::game::collider::CircleCollider { radius: 12.0 },
