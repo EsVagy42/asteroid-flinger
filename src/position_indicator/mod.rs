@@ -1,5 +1,5 @@
 use crate::game::components::*;
-use bevy::prelude::*;
+use bevy::{asset::UpdateAssets, prelude::*};
 
 const INDICATOR_Z_POSITION: f32 = 900.;
 const INDICATOR_OPACITY_DIVIDER: f32 = crate::game::wrap::MODULO_HALF;
@@ -59,6 +59,32 @@ pub struct OffscreenIndicator;
 pub struct OffscreenIndicatorBundle {
     pub position_indicator: PositionIndicator,
     pub offscreen_indicator: OffscreenIndicator,
+}
+
+#[derive(Event)]
+pub struct OffscreenIndicatorSpawnEvent {
+    indicated_entity: Entity,
+}
+
+fn spawn_offscreen_indicator(
+    mut commands: Commands,
+    mut spawn_event_reader: EventReader<OffscreenIndicatorSpawnEvent>,
+    query: Query<(&Sprite, &Handle<Image>, &TextureAtlas)>,
+) {
+    for spawn_event in spawn_event_reader.read() {
+        let (sprite, image_handle, texture_atlas) =
+            query.get(spawn_event.indicated_entity).unwrap();
+
+        commands.spawn((
+            OffscreenIndicatorBundle {
+                position_indicator: PositionIndicator(spawn_event.indicated_entity),
+                offscreen_indicator: OffscreenIndicator,
+            },
+            sprite.clone(),
+            image_handle.clone(),
+            texture_atlas.clone(),
+        ));
+    }
 }
 
 fn update_offscreen_indicator(
@@ -153,6 +179,7 @@ impl Plugin for PositionIndicatorPlugin {
                 update_offscreen_indicator,
                 update_indicator_atlas,
                 set_indicator_opacity,
+                spawn_offscreen_indicator.run_if(on_event::<OffscreenIndicatorSpawnEvent>()),
             ),
         );
     }

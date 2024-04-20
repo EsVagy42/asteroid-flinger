@@ -1,15 +1,16 @@
 use bevy::prelude::*;
 
 mod asteroid;
+mod enemy;
+mod explosion;
 mod game;
 mod input;
 mod movement;
 mod player;
+mod position_indicator;
+mod spawner;
 mod sprite_updater;
 mod startup;
-mod enemy;
-mod explosion;
-mod position_indicator;
 
 fn main() {
     App::new()
@@ -28,4 +29,3 @@ fn main() {
         .add_systems(Startup, startup::startup)
         .run();
 }
-
