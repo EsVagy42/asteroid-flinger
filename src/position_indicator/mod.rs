@@ -1,5 +1,5 @@
 use crate::game::components::*;
-use bevy::{asset::UpdateAssets, prelude::*};
+use bevy::prelude::*;
 
 const INDICATOR_Z_POSITION: f32 = 900.;
 const INDICATOR_OPACITY_DIVIDER: f32 = crate::game::wrap::MODULO_HALF;
@@ -171,6 +171,7 @@ pub struct PositionIndicatorPlugin;
 
 impl Plugin for PositionIndicatorPlugin {
     fn build(&self, app: &mut App) {
+        app.add_event::<OffscreenIndicatorSpawnEvent>();
         app.add_systems(
             Update,
             (
