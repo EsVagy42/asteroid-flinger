@@ -37,7 +37,7 @@ struct Wave {
 struct CurrentWave(Wave);
 
 #[derive(Event)]
-struct WaveEvent;
+pub struct WaveEvent;
 
 #[derive(Clone, Default)]
 struct GameWaves {
@@ -82,10 +82,12 @@ fn on_wave_event(mut wave: ResMut<CurrentWave>, mut game_waves: ResMut<CurrentGa
     }
 }
 
-struct SpawnerPlugin;
+pub struct SpawnerPlugin;
 
 impl Plugin for SpawnerPlugin {
     fn build(&self, app: &mut App) {
+        app.add_event::<SpawnEvent>();
+        app.add_event::<WaveEvent>();
         app.init_resource::<CurrentGameWaves>();
         app.init_resource::<CurrentWave>();
         app.init_resource::<CurrentSpawner>();

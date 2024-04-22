@@ -18,6 +18,7 @@ fn main() {
         .add_plugins((
             game::GamePlugin,
             input::InputPlugin,
+            spawner::SpawnerPlugin,
             sprite_updater::SpriteUpdaterPlugin,
             movement::MovementPlugin,
             explosion::ExplosionPlugin,
