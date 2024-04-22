@@ -1,14 +1,8 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 
-use crate::enemy::EnemyBundle;
 use crate::game::components::*;
-use crate::position_indicator::{OffscreenIndicator, OffscreenIndicatorBundle, PositionIndicator};
 
-pub fn startup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
+pub fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle {
         projection: OrthographicProjection {
             scaling_mode: ScalingMode::AutoMax {
