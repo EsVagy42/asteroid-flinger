@@ -85,32 +85,3 @@ pub struct EnemyBundle {
     pub collider: CircleCollider,
     pub sprite_sheet_bundle: SpriteSheetBundle,
 }
-
-impl EnemyBundle {
-    pub fn new(
-        position: Vec2,
-        drag: f32,
-        collider_radius: f32,
-        image: Handle<Image>,
-        sprite_size: Vec2,
-        texture_atlas: TextureAtlas,
-    ) -> Self {
-        Self {
-            enemy: Enemy,
-            game_components: GameComponentsBundle::new(position, drag),
-            collider: CircleCollider {
-                radius: collider_radius,
-            },
-            sprite_sheet_bundle: SpriteSheetBundle {
-                sprite: Sprite {
-                    custom_size: Some(sprite_size),
-                    ..Default::default()
-                },
-                texture: image,
-                atlas: texture_atlas,
-                transform: Transform::from_xyz(0., 0., 1.),
-                ..Default::default()
-            },
-        }
-    }
-}
